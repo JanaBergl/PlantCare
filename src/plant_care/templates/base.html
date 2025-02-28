@@ -1,0 +1,71 @@
+{% extends 'bootstrap5/bootstrap5.html' %}
+{% load bootstrap5 %}
+{% load static %}
+
+
+{% block bootstrap5_title %}Title{% endblock %}
+
+{% block bootstrap5_extra_head %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="icon" type="image/png" href="{% static 'img/favicon.ico' %}">
+{% endblock %}
+
+{% block bootstrap5_content %}
+    <div id="page-wrapper">
+        <!-- Header -->
+        <div id="header">
+            <div class="container">
+                <h1><a href="/" id="logo">Plant Care Manager <em>by JB</em></a></h1>
+                <nav id="nav" class="nav">
+                    <a href="/" class="nav-link">Home</a>
+                    <div class="dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            Plants
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="#">Collection</a></li>
+                            <li><a class="dropdown-item" href="#">Add new</a></li>
+                            <li><a class="dropdown-item" href="#">Update</a></li>
+                            <li><a class="dropdown-item" href="#">Delete</a></li>
+
+                        </ul>
+                    </div>
+                    <a href="#" class="nav-link">Tasks</a>
+                    <a href="#" class="nav-link">History</a>
+                    <a href="#" class="nav-link">About</a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Banner -->
+        {% block banner %}{% endblock %}
+
+        <!-- Main content -->
+        <section class="wrapper style1">
+            <div class="container">
+                {% block content %}
+                    <p>No content available.</p>
+                {% endblock %}
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <div id="footer">
+            <div class="container">
+                <ul class="icons">
+                    <li><a href="#" class="icon brands fa-github"><span class="label">GitHub</span></a></li>
+                    <li><a href="#" class="icon brands fa-linkedin-in"><span class="label">LinkedIn</span></a></li>
+                </ul>
+                <div class="copyright">
+                    <ul class="menu">
+                        <li>Plant Care Manager</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    {% block extra_scripts %}
+    {% endblock %}
+{% endblock %}
