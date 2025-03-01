@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load bootstrap5 %}
+
+
+
+{% block title %}Plant Care Manager{% endblock %}
+
+{% block banner %}
+<section id="banner">
+    <header>
+        <h2>Hello, {% if user_name %}{{ user_name }}{% else %}user!{% endif %} Welcome to TBD... app</h2>
+        <p>Track your plants, plan tasks, and check care history</p>
+    </header>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <section class="col-4 col-12-narrower">
+        <div class="box highlight">
+            <a href="{% url 'plant_care:plant-list' %}" class="text-decoration-none text-dark">
+                <div class="circle-wrapper">
+                    <img src="{% static 'img/plants.png' %}" alt="My Plants">
+                </div>
+                <h2>Plants</h2>
+                <p>View and manage your plant collection</p>
+            </a>
+        </div>
+    </section>
+    <section class="col-4 col-12-narrower">
+        <div class="box highlight">
+            <div class="circle-wrapper">
+                <img src="{% static 'img/tasks.png' %}" alt="Plant tasks">
+            </div>
+            <h2>Tasks</h2>
+            <p>Keep track of watering, fertilizing, and repotting schedules</p>
+        </div>
+    </section>
+    <section class="col-4 col-12-narrower">
+        <div class="box highlight">
+            <div class="circle-wrapper">
+            <img src="{% static 'img/history.png'%}" alt="Care history">
+            </div>
+            <h2>History</h2>
+            <p>Check past actions and logs</p>
+        </div>
+    </section>
+</div>
+{% endblock %}

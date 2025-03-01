@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load bootstrap5 %}
+
+
+
+{% block title %}Delete Plant{% endblock %}
+
+
+{% block content %}
+    <div class="container mt-5 mb-5 position-relative">
+        <div class="d-flex flex-column align-items-center">
+            <p class="fs-5 text-center">Are you sure you want to delete <strong>{{ group.group_name }}</strong>?</p>
+                    <br>
+                    <br>
+            {% if group.group_name == "Uncategorized" %}
+                <div class="alert alert-warning text-center mb-5" role="alert">
+                    The 'Uncategorized' group cannot be deleted!
+                </div>
+            {% endif %}
+            <form method="post" action="{% url 'plant_care:plant-group-delete' group.pk %}">
+                {% csrf_token %}
+                <div class="d-flex justify-content-center gap-3">
+
+                    <a href="{% url 'plant_care:plant-list' %}" class="btn btn-outline-success">Cancel</a>
+                    <button type="submit" class="btn btn-outline-danger">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

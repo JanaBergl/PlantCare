@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load bootstrap5 %}
+
+
+
+{% block title %}Plant List{% endblock %}
+
+
+{% block content %}
+    {% if plants %}
+        <div class="container mt-3">
+            <div class="d-flex justify-content-start mb-2">
+                <a href="{% url 'plant_care:plant-create' %}" class="text-decoration-none text-dark fs-3"><b>➕</b></a>
+            </div>
+
+            <table class="table table-striped table-hover table-bordered table-sm table-responsive">
+                <thead class="table-success">
+                <tr>
+                    <th>Name</th>
+                    <th>Group</th>
+                    <th>Purchase Date</th>
+                    <th class="text-center">Detail</th>
+                    <th class="text-center">Update</th>
+                    <th class="text-center">Delete</th>
+                    <th class="text-center">RIP</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for plant in plants %}
+                    <tr>
+                        <td><a class="text-decoration-none text-dark" href="{% url 'plant_care:plant-detail' plant.pk %}">{{ plant.name }}</a></td>
+                        <td><a class="text-decoration-none text-dark" href="{% url 'plant_care:plant-group-detail' plant.group.pk %}">{{ plant.group }}</a></td>
+                        <td>{{ plant.date|date:"d.m.Y" }}</td>
+                        <td class="text-center">
+                            <a class="text-decoration-none" href="{% url 'plant_care:plant-detail' plant.pk %}">🔍</a>
+                        </td>
+                        <td class="text-center">
+                            <a class="text-decoration-none" href="{% url 'plant_care:plant-update' plant.pk %}">✏️</a>
+                        </td>
+                        <td class="text-center">
+                            <a class="text-decoration-none" href="{% url 'plant_care:plant-delete' plant.pk %}">🗑️</a>
+                        <td class="text-center">
+                            <a class="text-decoration-none" href="#">🪦</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="text-center mt-5">There are no plants in the database.</p>
+        <div class="container">
+            <div class="d-flex justify-content-center mb-2">
+                <a href="{% url 'plant_care:plant-create' %}" id="a-button" class="btn btn-outline-success"><b>Create a plant</b></a>
+            </div>
+        </div>
+    {% endif %}
+
+{% endblock %}
