@@ -16,6 +16,22 @@ class PlantGroup(models.Model):
     def __repr__(self) -> str:
         return f"PlantGroup(group_name={self.group_name})"
 
+    def delete(self, *args, **kwargs):
+        """
+        Overrides parent 'delete' method. Ensures that default group 'Uncategorized' cannot be deleted.
+        If a different group is deleted, all plants from that group are moved to default group 'Uncategorized'.
+        """
+        if self.group_name == "Uncategorized":
+            raise ValueError("The 'Uncategorized' group cannot be deleted.")
+
+        # Filter plants in deleted group
+        plants_in_group = Plant.objects.filter(group=self)
+        for plant in plants_in_group:
+            plant.group = None
+            plant.save()
+
+        super().delete(*args, **kwargs)
+
 
 class Plant(models.Model):
     """
@@ -28,7 +44,7 @@ class Plant(models.Model):
     is_alive = models.BooleanField(default=True)
 
     def __str__(self) -> str:
-        return f"{self.name}"
+        return f"Plant - {self.name}"
 
     def __repr__(self) -> str:
         return f"Plant(name={self.name}, date={self.date}, group={self.group}, notes={self.notes}, is_alive={self.is_alive})"

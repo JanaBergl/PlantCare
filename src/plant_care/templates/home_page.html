@@ -19,11 +19,13 @@
 <div class="row">
     <section class="col-4 col-12-narrower">
         <div class="box highlight">
-            <div class="circle-wrapper">
-                <img src="{% static 'img/plants.png' %}" alt="My Plants">
-            </div>
-            <h2>Plants</h2>
-            <p>View and manage your plant collection</p>
+            <a href="{% url 'plant_care:plant-list' %}" class="text-decoration-none text-dark">
+                <div class="circle-wrapper">
+                    <img src="{% static 'img/plants.png' %}" alt="My Plants">
+                </div>
+                <h2>Plants</h2>
+                <p>View and manage your plant collection</p>
+            </a>
         </div>
     </section>
     <section class="col-4 col-12-narrower">

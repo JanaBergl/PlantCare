@@ -12,12 +12,33 @@ html, body {
 #header {
     background-color: #e8ffec;
     text-align: center;
+    padding: 20px 20px;
+}
 
+
+#nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-left {
+    display: flex;
+    align-items: center;
+}
+
+.nav-right {
+    margin-left: auto;
+}
+
+.btn {
+    display: flex;
+    align-items: center;
 }
 
 
 #footer {
-    margin-top: auto; /* Toto posune footer dolů, pokud obsah nevyplní celou výšku */
+    margin-top: auto;
     padding: 20px 0;
     background-color: #e8ffec
 }
@@ -79,4 +100,8 @@ footer {
 #banner {
     text-align: center;
     margin-top: auto;
+}
+
+.a-button {
+    text-decoration: none !important;
 }

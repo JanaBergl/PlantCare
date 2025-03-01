@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load bootstrap5 %}
+
+
+
+{% block title %}Group detail{% endblock %}
+
+
+{% block content %}
+    <div class="container mt-5 mb-5 position-relative">
+        <a href="{% url 'plant_care:plant-group-list' %}"
+           class="position-absolute top-0 start-0 m-3 text-decoration-none text-dark fs-3">
+            🔙
+        </a>
+        <div class="d-flex justify-content-center align-items-center mb-4">
+
+            <table class="table table-bordered table-responsive w-50 mx-auto">
+                <thead class="table-success">
+                <tr>
+                    <th colspan="2" class="text-center fs-3">{{ group.group_name }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <th scope="row">Number of plants</th>
+                    <td><a href="#" class="text-decoration-none text-dark text-center">{{ num_plants }}</a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="d-flex justify-content-center mt-4">
+            <a href="{% url 'plant_care:plant-group-update' group.pk %}" class="btn me-2">✏️ Update</a>
+            <a href="{% url 'plant_care:plant-group-delete' group.pk %}" class="btn">🗑️ Delete</a>
+        </div>
+    </div>
+
+{% endblock %}

@@ -16,29 +16,54 @@
         <div id="header">
             <div class="container">
                 <h1><a href="/" id="logo">Plant Care Manager <em>by JB</em></a></h1>
-                <nav id="nav" class="nav">
-                    <a href="/" class="nav-link">Home</a>
-                    <div class="dropdown">
-                        <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            Plants
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="#">Collection</a></li>
-                            <li><a class="dropdown-item" href="#">Add new</a></li>
-                            <li><a class="dropdown-item" href="#">Update</a></li>
-                            <li><a class="dropdown-item" href="#">Delete</a></li>
+                <nav id="nav" class="nav d-flex justify-content-between align-items-center">
+                    <div class="nav-left d-flex">
+                        <a href="/" class="nav-link">Home</a>
+                        <div class="dropdown">
+                            <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                Plants
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="{% url 'plant_care:plant-list' %}">Plant list</a></li>
+                                <li><a class="dropdown-item" href="{% url 'plant_care:plant-create' %}">Add new</a></li>
 
-                        </ul>
+                            </ul>
+                        </div>
+
+                        <div class="dropdown">
+                            <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                Groups
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="{% url 'plant_care:plant-group-list' %}">Group list</a></li>
+                                <li><a class="dropdown-item" href="{% url 'plant_care:plant-group-create' %}">Add new</a></li>
+
+                            </ul>
+                        </div>
+                        <a href="#" class="nav-link">Tasks</a>
+                        <a href="#" class="nav-link">History</a>
+                        <a href="#" class="nav-link">About</a>
                     </div>
-                    <a href="#" class="nav-link">Tasks</a>
-                    <a href="#" class="nav-link">History</a>
-                    <a href="#" class="nav-link">About</a>
+
+                    <div class="nav-right ml-auto">
+                        <a href="#" class="btn btn-sm btn-outline-success">Login</a>
+                    </div>
                 </nav>
             </div>
         </div>
 
         <!-- Banner -->
         {% block banner %}{% endblock %}
+
+        {% if messages %}
+            <div class="container mt-3">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
 
         <!-- Main content -->
         <section class="wrapper style1">

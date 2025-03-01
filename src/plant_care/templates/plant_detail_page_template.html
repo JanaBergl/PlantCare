@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load bootstrap5 %}
+
+
+
+{% block title %}Plant detail{% endblock %}
+
+
+{% block content %}
+    <div class="container mt-5 mb-5 position-relative">
+        <a href="{% url 'plant_care:plant-list' %}"
+           class="position-absolute top-0 start-0 m-3 text-decoration-none text-dark fs-3">
+            🔙
+        </a>
+        <div class="d-flex justify-content-center align-items-center mb-4">
+
+            <table class="table table-bordered table-responsive w-50 mx-auto">
+                <thead class="table-success">
+                <tr>
+                    <th colspan="2" class="text-center fs-3">{{ plant.name }}</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr>
+                    <th scope="row" style="width: 30%">Group</th>
+                    <td><a href="{% url 'plant_care:plant-group-detail' plant.group.pk %}"
+                           class="text-decoration-none text-dark text-center">{{ plant.group }}</a></td>
+                </tr>
+                <tr>
+                    <th scope="row">Date of purchase</th>
+                    <td>{{ plant.date|date:"d. m. Y" }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Notes</th>
+                    <td>{{ plant.notes }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">History</th>
+                    <td>doplnit!</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="d-flex justify-content-center mt-4">
+            <a href="{% url 'plant_care:plant-update' plant.pk %}" class="btn me-2">✏️ Update</a>
+            <a href="{% url 'plant_care:plant-delete' plant.pk %}" class="btn">🗑️ Delete</a>
+        </div>
+    </div>
+{% endblock %}
