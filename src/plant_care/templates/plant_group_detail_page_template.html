@@ -24,7 +24,7 @@
                 <tbody>
                 <tr>
                     <th scope="row">Number of plants</th>
-                    <td><a href="#" class="text-decoration-none text-dark text-center">{{ num_plants }}</a></td>
+                    <td><a href="{% url 'plant_care:plants-in-group-list' group.pk %}" class="text-decoration-none text-dark text-center">{{ num_plants }}</a></td>
                 </tr>
                 </tbody>
             </table>

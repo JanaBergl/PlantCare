@@ -16,10 +16,10 @@ class PlantGroup(models.Model):
     def __repr__(self) -> str:
         return f"PlantGroup(group_name={self.group_name})"
 
-    def delete(self, *args, **kwargs):
+    def delete(self, *args, **kwargs) -> None:
         """
         Overrides parent 'delete' method. Ensures that default group 'Uncategorized' cannot be deleted.
-        If a different group is deleted, all plants from that group are moved to default group 'Uncategorized'.
+        When another group is deleted, all plants in that group are reassigned to default 'Uncategorized'
         """
         if self.group_name == "Uncategorized":
             raise ValueError("The 'Uncategorized' group cannot be deleted.")
@@ -38,7 +38,7 @@ class Plant(models.Model):
     Represents a plant, with attributes: name, group, date of purchase, notes, and its current status (alive or not).
     """
     name = models.CharField(max_length=100, unique=True)
-    group = models.ForeignKey(PlantGroup, on_delete=models.SET_NULL, null=True, blank=True)
+    group = models.ForeignKey(PlantGroup, on_delete=models.SET_NULL, null=True, blank=True, related_name="plants")
     date = models.DateField(default=now)
     notes = models.TextField(null=True, blank=True)
     is_alive = models.BooleanField(default=True)

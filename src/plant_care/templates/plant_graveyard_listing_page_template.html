@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load bootstrap5 %}
+
+
+
+{% block title %}Plant Graveyard{% endblock %}
+
+
+{% block content %}
+    {% if graveyard %}
+        <div class="container mt-3">
+            <div class="d-flex flex-column align-items-center">
+                <br>
+                <p class="fs-3 text-center">🪦 Plant graveyard 🪦</p>
+                <br>
+            </div>
+            <div class="d-flex flex-column align-items-center">
+                <table class="table table-striped table-hover table-bordered table-sm table-responsive"
+                       style="width: 75%">
+                    <thead class="table-success">
+                    <tr>
+                        <th style="width: 20%">Plant</th>
+                        <th style="width: 20%">Time of death</th>
+                        <th style="width: 20%">Cause of death</th>
+                        <th class="text-center" style="width: 12%">Detail</th>
+                        <th class="text-center" style="width: 12%">Delete</th>
+                        <th class="text-center" style="width: 12%">Bring back</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for plant in graveyard %}
+                        <tr>
+                            <td><a class="text-decoration-none text-dark" href="{% url 'plant_care:plant-detail' plant.plant.pk %}">{{ plant.plant.name }}</a></td>
+                            <td>{{ plant.date_of_death|date:"d. m. Y" }}</td>
+                            <td>{{ plant.cause_of_death }}</td>
+                            <td class="text-center">
+                                <a class="text-decoration-none" href="{% url 'plant_care:plant-detail' plant.plant.pk %}">🔍</a>
+                            <td class="text-center">
+                                <a class="text-decoration-none" href="{% url 'plant_care:plant-delete' plant.plant.pk %}">🗑️</a>
+                            <td class="text-center">
+                                <a class="text-decoration-none" href="#">?</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <p class="text-center mt-5">There are no plants in the graveyard.</p>
+    {% endif %}
+
+{% endblock %}

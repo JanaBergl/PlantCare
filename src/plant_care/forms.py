@@ -1,5 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
+from plant_care.constants import CAUSE_OF_DEATH_CHOICES
 from plant_care.models import Plant, PlantGroup
 
 
@@ -50,7 +51,12 @@ class PlantGroupModelForm(forms.ModelForm):
         }
 
 
-
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': ''}),
         }
+
+class CauseOfDeathForm(forms.Form):
+    """
+    Form to allow user to choose the cause of death for a plant.
+    """
+    cause_of_death = forms.ChoiceField(choices=CAUSE_OF_DEATH_CHOICES, required=True)

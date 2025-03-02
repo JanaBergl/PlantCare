@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load bootstrap5 %}
+
+
+
+{% block title %}RIP Plant{% endblock %}
+
+
+{% block content %}
+    <div class="container mt-5 mb-5 position-relative">
+        <div class="d-flex flex-column align-items-center">
+            <p class="fs-5 text-center">Are you sure you want to move <strong>'{{ plant.name }}' ({{ plant.group }})</strong> into the graveyard?</p>
+                    <br>
+                    <br>
+            <form method="post" action="{% url 'plant_care:dead-plant' plant.pk %}">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <br>
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="{% url 'plant_care:plant-list' %}" class="btn btn-outline-success">Cancel</a>
+                    <button type="submit" class="btn btn-outline-danger">R.I.P.</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

@@ -9,10 +9,19 @@
 
 {% block content %}
     <div class="container mt-5 mb-5 position-relative">
-        <a href="{% url 'plant_care:plant-list' %}"
-           class="position-absolute top-0 start-0 m-3 text-decoration-none text-dark fs-3">
-            🔙
-        </a>
+        {% if plant.is_alive %}
+            <a href="{% url 'plant_care:plant-list' %}"
+               class="position-absolute top-0 start-0 m-3 text-decoration-none text-dark fs-3">
+                🔙
+            </a>
+        {% else %}
+            <a href="{% url 'plant_care:plant-graveyard-list' %}"
+               class="position-absolute top-0 start-0 m-3 text-decoration-none text-dark fs-3">
+                🔙
+            </a>
+
+        {% endif %}
+
         <div class="d-flex justify-content-center align-items-center mb-4">
 
             <table class="table table-bordered table-responsive w-50 mx-auto">
@@ -36,10 +45,13 @@
                     <th scope="row">Notes</th>
                     <td>{{ plant.notes }}</td>
                 </tr>
-                <tr>
-                    <th scope="row">History</th>
-                    <td>doplnit!</td>
-                </tr>
+                {% if plant.is_alive %}
+                    <tr>
+                        <th scope="row">History</th>
+                        <td>doplnit!</td>
+                    </tr>
+                {% endif %}
+
                 </tbody>
             </table>
         </div>
