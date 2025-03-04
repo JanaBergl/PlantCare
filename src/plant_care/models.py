@@ -78,11 +78,11 @@ class PlantCareHistory(models.Model):
     """
 
     plant = models.ForeignKey(Plant, on_delete=models.CASCADE)
-    task_type = models.CharField(max_length=20, choices=TASK_CATEGORY_CHOICES)
+    task_type = models.CharField(max_length=25, choices=TASK_CATEGORY_CHOICES)
     task_date = models.DateTimeField(default=now)  # formát
 
     def __str__(self) -> str:
-        return f"{self.plant.name} has been {self.get_task_type_display().lower()} on {self.task_date.strftime('%d-%m-%Y %H:%M')}"
+        return f"{self.plant.name} has been {self.get_task_type_display()} on {self.task_date.strftime('%d-%m-%Y %H:%M')}"
 
     def __repr__(self) -> str:
         return f"PlantCareHistory(plant={self.plant.id}, task_type='{self.task_type}', task_date={self.task_date!r})"
@@ -102,6 +102,7 @@ def get_default_frequency(task_type) -> int | None:
 
     :return: The default frequency for a given task type or None
     """
+
     return TASK_FREQUENCIES.get(task_type, None)
 
 
@@ -110,12 +111,12 @@ class PlantTaskFrequency(models.Model):
     Represents the frequency at which a specific task should be performed for a particular plant.
     """
 
-    plant = models.ForeignKey(Plant, on_delete=models.CASCADE)
-    task_type = models.CharField(max_length=20, choices=TASK_CATEGORY_CHOICES)
+    plant = models.ForeignKey(Plant, on_delete=models.CASCADE, related_name="task_frequencies")
+    task_type = models.CharField(max_length=25, choices=TASK_CATEGORY_CHOICES)
     frequency = models.IntegerField(null=True, blank=True)
 
     def __str__(self) -> str:
-        return f"{self.plant.name} should be {self.get_task_type_display().lower()} every {self.frequency} days" if self.frequency else f"{self.plant.name} has no specific schedule for {self.get_task_type_display().lower()}"
+        return f"{self.plant.name} should be {self.get_task_type_display()} every {self.frequency} days" if self.frequency else f"{self.plant.name} has no specific schedule for {self.get_task_type_display()}"
 
     def __repr__(self) -> str:
         return f"PlantTaskFrequency(plant={self.plant.name}, task_type={self.task_type}, frequency={self.frequency})"
@@ -131,7 +132,7 @@ class PlantTaskFrequency(models.Model):
 
 class PlantGraveyard(models.Model):
     """
-    Represents the 'graveyard' where dead plants are moved. Stores the plant associated with the graveyard entry, the date of death, and optional cause of death.
+    Represents the 'graveyard' where dead plants are moved. Stores the plant associated with the graveyard entry, the date of death, and cause of death.
     """
 
     plant = models.OneToOneField(Plant, on_delete=models.CASCADE)

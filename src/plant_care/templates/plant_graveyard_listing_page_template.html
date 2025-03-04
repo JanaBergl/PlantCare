@@ -33,7 +33,7 @@
                         <tr>
                             <td><a class="text-decoration-none text-dark" href="{% url 'plant_care:plant-detail' plant.plant.pk %}">{{ plant.plant.name }}</a></td>
                             <td>{{ plant.date_of_death|date:"d. m. Y" }}</td>
-                            <td>{{ plant.cause_of_death }}</td>
+                            <td>{{ plant.get_cause_of_death_display }}</td>
                             <td class="text-center">
                                 <a class="text-decoration-none" href="{% url 'plant_care:plant-detail' plant.plant.pk %}">🔍</a>
                             <td class="text-center">

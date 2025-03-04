@@ -24,7 +24,7 @@
 
         <div class="d-flex justify-content-center align-items-center mb-4">
 
-            <table class="table table-bordered table-responsive w-50 mx-auto">
+            <table class="table table-bordered table-striped table-responsive w-50 mx-auto">
                 <thead class="table-success">
                 <tr>
                     <th colspan="2" class="text-center fs-3">{{ plant.name }}</th>
@@ -51,7 +51,21 @@
                         <td>doplnit!</td>
                     </tr>
                 {% endif %}
-
+                {% if task_frequencies %}
+                    {% for task in task_frequencies %}
+                        {% if task.frequency %}
+                            <tr>
+                                <th scope="row">{{ task.task_type }}</th>
+                                <td>Every {{ task.frequency }} days</td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <th scope="row">Care frequency</th>
+                        <td>No frequencies set</td>
+                    </tr>
+                {% endif %}
                 </tbody>
             </table>
         </div>

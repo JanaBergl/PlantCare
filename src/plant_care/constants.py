@@ -1,17 +1,17 @@
 TASK_CATEGORY_CHOICES = [
-    ("W", "Watered"),
-    ("F", "Fertilized"),
-    ("R", "Repotted"),
-    ("V", "Given vitamins"),
-    ("I", "Treated with insecticide")
+    ("Watering", "watered"),
+    ("Fertilizing", "fertilized"),
+    ("Repotting", "repotted"),
+    ("Vitamin treatment", "given vitamins"),
+    ("Insecticide treatment", "treated with insecticide")
 ]
 
 TASK_FREQUENCIES = {
-    "W": 7,
-    "F": 30,
-    "R": 730,
-    "V": None,
-    "I": None,
+    "Watering": 7,
+    "Fertilizing": 30,
+    "Repotting": 730,
+    "Vitamin treatment": None,
+    "Insecticide treatment": None,
 }
 
 CAUSE_OF_DEATH_CHOICES = [
