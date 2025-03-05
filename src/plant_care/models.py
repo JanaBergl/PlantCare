@@ -1,3 +1,4 @@
+from django.urls import reverse_lazy
 from django.utils.timezone import now
 from django.db import models
 from plant_care.constants import TASK_CATEGORY_CHOICES, TASK_FREQUENCIES, CAUSE_OF_DEATH_CHOICES
@@ -24,13 +25,19 @@ class PlantGroup(models.Model):
         if self.group_name == "Uncategorized":
             raise ValueError("The 'Uncategorized' group cannot be deleted.")
 
-        # Filter plants in deleted group
+        # plants v deleted group -> group=None -> group="Uncategorized" (save metoda v Plant)
         plants_in_group = Plant.objects.filter(group=self)
         for plant in plants_in_group:
             plant.group = None
             plant.save()
 
         super().delete(*args, **kwargs)
+
+    def get_absolute_url(self) -> str:
+        """
+        Returns the absolute url to the plant group detail view.
+        """
+        return reverse_lazy("plant_care:plant-group-detail", kwargs={"pk": self.id})
 
 
 class Plant(models.Model):
@@ -56,6 +63,12 @@ class Plant(models.Model):
         if self.group is None:
             self.group = PlantGroup.objects.get_or_create(group_name='Uncategorized')[0]
         super().save(*args, **kwargs)
+
+    def get_absolute_url(self) -> str:
+        """
+        Returns the absolute url to the plant detail view.
+        """
+        return reverse_lazy("plant_care:plant-detail", kwargs={"pk": self.id})
 
     def move_to_graveyard(self, reason: str) -> None:
         """
@@ -94,6 +107,19 @@ class PlantCareHistory(models.Model):
         :return: A string representing the task date formatted as "%d/%m/%Y %H:%M"
         """
         return self.task_date.strftime("%d/%m/%Y %H:%M")
+
+    def perform_task(self, task_type, task_date):
+        """"""
+        if task_type not in TASK_CATEGORY_CHOICES:
+            raise ValueError("Invalid task type.")
+
+        task_history = PlantCareHistory.objects.create(
+            plant=self.plant,
+            task_type=task_type,
+            task_date=task_date,
+        )
+
+        return task_history
 
 
 def get_default_frequency(task_type) -> int | None:

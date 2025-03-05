@@ -50,21 +50,31 @@
                         <th scope="row">History</th>
                         <td>doplnit!</td>
                     </tr>
-                {% endif %}
-                {% if task_frequencies %}
-                    {% for task in task_frequencies %}
-                        {% if task.frequency %}
-                            <tr>
-                                <th scope="row">{{ task.task_type }}</th>
-                                <td>Every {{ task.frequency }} days</td>
-                            </tr>
-                        {% endif %}
-                    {% endfor %}
+                    {% if task_frequencies %}
+                        {% for task in task_frequencies %}
+                            {% if task.frequency %}
+                                <tr>
+                                    <th scope="row">{{ task.task_type }}</th>
+                                    <td>Every {{ task.frequency }} days</td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <th scope="row">Care frequency</th>
+                            <td>No frequencies set</td>
+                        </tr>
+                    {% endif %}
                 {% else %}
                     <tr>
-                        <th scope="row">Care frequency</th>
-                        <td>No frequencies set</td>
+                        <th scope="row">Time of death</th>
+                        <td> {{ plant.plantgraveyard.date_of_death|date:"d. m. Y" }}</td>
                     </tr>
+                    <tr>
+                        <th scope="row">Cause of death</th>
+                        <td> {{ plant.plantgraveyard.get_cause_of_death_display }}</td>
+                    </tr>
+
                 {% endif %}
                 </tbody>
             </table>

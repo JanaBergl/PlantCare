@@ -33,14 +33,14 @@
                     {% for group in groups %}
                         <tr>
                             <td><a class="text-decoration-none text-dark"
-                                   href="{% url 'plant_care:plant-group-detail' group.pk %}">{{ group.group_name }}</a>
+                                   href="{{ group.get_absolute_url }}">{{ group.group_name }}</a>
                             </td>
                             <td><a class="text-decoration-none text-dark"
                                    href="{% url 'plant_care:plants-in-group-list' group.pk %}">{{ group.num_plants }}</a>
                             </td>
                             <td class="text-center">
                                 <a class="text-decoration-none"
-                                   href="{% url 'plant_care:plant-group-detail' group.pk %}">🔍</a>
+                                   href="{{ group.get_absolute_url }}">🔍</a>
                             </td>
                             <td class="text-center">
                                 <a class="text-decoration-none"
@@ -56,7 +56,8 @@
                 </table>
             </div>
             <div class="d-flex justify-content-center mt-4">
-                <a href="{% url 'plant_care:plant-group-create' %}" class="btn me-2 btn-outline-success">Add new group</a>
+                <a href="{% url 'plant_care:plant-group-create' %}" class="btn me-2 btn-outline-success">Add new
+                    group</a>
             </div>
         </div>
     {% else %}

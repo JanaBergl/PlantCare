@@ -102,6 +102,57 @@ footer {
     margin-top: auto;
 }
 
-.a-button {
-    text-decoration: none !important;
+/* Styl tlačítka - vlastní gradient do zelena */
+.btn-animace {
+    background: linear-gradient(45deg, darkseagreen, mediumseagreen); /* Zelený gradient */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 18px;
+    border-radius: 8px;
+    transition: transform 0.2s, box-shadow 0.2s;
 }
+
+/* Efekt hover - tlačítko se zvětší a přidá se stín */
+.btn-animace:hover {
+    box-shadow: 0px 4px 10px rgba(40, 167, 69, 0.5); /* Zelený stín */
+}
+
+/* Efekt kliknutí - tlačítko se na moment zmenší */
+.btn-animace:active {
+    transform: scale(0.9);
+}
+
+/* Vynucení zelené barvy pro VŠECHNY checkboxy */
+input[type="checkbox"],
+.form-check-input {
+    cursor: pointer;
+    accent-color: #28a745 !important; /* Vynutíme zelenou */
+    transition: 0.2s ease-in-out;
+}
+
+/* Efekt zvětšení při hoveru */
+input[type="checkbox"]:hover {
+    transform: scale(1.1);
+}
+
+/* Zvýraznění při zaškrtnutí */
+input[type="checkbox"]:checked,
+.form-check-input:checked {
+    filter: drop-shadow(0 0 5px rgba(40, 167, 69, 0.8)); /* Zelená záře */
+}
+
+/* Zvýraznění labelu při zaškrtnutí */
+input[type="checkbox"]:checked + label,
+.form-check-input:checked + label {
+    font-weight: bold;
+    color: #28a745;
+}
+
+/* Úprava pro zaškrtnutí checkboxů a zachování správného vzhledu textu */
+input[type="checkbox"]:checked {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+

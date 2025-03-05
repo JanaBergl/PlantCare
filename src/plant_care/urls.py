@@ -1,8 +1,9 @@
 from django.urls import path
-from plant_care.views import HomePageTemplateView, PlantListingView, PlantDetailView, PlantCreateView, \
-    PlantGroupCreateView, PlantGroupListingView, PlantGroupDetailView, PlantUpdateView, PlantGroupUpdateView, \
+from plant_care.views import HomePageTemplateView, PlantListingView, PlantDetailView, \
+    PlantGroupCreateView, PlantGroupListingView, PlantGroupDetailView, PlantGroupUpdateView, \
     PlantDeleteView, PlantGroupDeleteView, DeadPlantView, PlantGraveyardListingView, PlantsInGroupListingView, \
-    plant_create_functional_view, PlantAndTaskFrequencyCreateGenericFormView, PlantAndTaskFrequencyUpdateGenericFormView
+    plant_create_functional_view, PlantAndTaskFrequencyCreateGenericFormView, \
+    PlantAndTaskFrequencyUpdateGenericFormView, PerformTaskView, PlantCareHistoryListingView
 
 app_name = 'plant_care'
 
@@ -24,4 +25,6 @@ urlpatterns = [
     #path('create-form/', plant_create_functional_view, name='plant_create-form'),
     #path('create-view/', PlantAndTaskFrequencyCreateView.as_view(), name='plant_create-view'),
     #path('update-view/<int:pk>/', PlantAndTaskFrequencyUpdateView.as_view(), name='plant_update-view'),
+    path('perform-tasks/', PerformTaskView.as_view(), name='perform-tasks'),
+    path('care-history/', PlantCareHistoryListingView.as_view(), name='care-history'),
 ]

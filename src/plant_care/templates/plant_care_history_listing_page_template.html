@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load bootstrap5 %}
+
+{% block bootstrap5_title %}Care History{% endblock %}
+
+{% block content %}
+    {% if history %}
+        <div class="container mt-3">
+            <div class="d-flex flex-column align-items-center">
+                <br>
+                <p class="fs-3 text-center">💧🌱 Care History 🌱💧</p>
+                <br>
+            </div>
+            <div class="d-flex justify-content-center align-items-center mb-4">
+                <table class="table table-striped table-bordered table-sm table-hover" style="table-layout: auto; max-width: 75%; word-wrap: break-word;">
+                    <tbody>
+                    {% for log in history %}
+                        <tr>
+                            <td colspan="3" class="text-center">
+                                "{{ log.plant.name }}" ("{{ log.plant.group }}") was
+                                <b>{{ log.get_task_type_display }}</b> on {{ log.formatted_task_date }}.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <p class="text-center mt-5">There is no care history.</p>
+        <div class="container">
+            <div class="d-flex justify-content-center mb-2">
+                <a href="{% url 'plant_care:perform-tasks' %}" id="a-button" class="btn btn-outline-success"><b>Tasks</b></a>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

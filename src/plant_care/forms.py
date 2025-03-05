@@ -162,3 +162,69 @@ class PlantAndTaskGenericForm(forms.Form):
                     widget=forms.NumberInput(
                         attrs={'class': 'form-control', 'placeholder': 'Optional' if initial_value is None else None})
                 )
+
+
+class BasePlantAndTaskGenericForm(forms.Form):
+    """
+    Base form for creating and updating Plant and PlantTaskFrequency objects at the same time.
+    """
+    name = forms.CharField(
+        label="Name",
+        max_length=50,
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+    )
+    group = forms.ModelChoiceField(
+        label="Group",
+        queryset=PlantGroup.objects.all(),
+        widget=forms.Select(attrs={"class": "form-control"}),
+        required=False,
+    )
+    date = forms.DateField(
+        label="Date of purchase",
+        widget=forms.DateInput(attrs={"type": "date", "class": "form-control"}),
+        initial=date.today,
+    )
+    notes = forms.CharField(
+        label="Notes",
+        widget=forms.Textarea(attrs={"class": "form-control"}),
+        required=False,
+    )
+
+    def __init__(self, *args, **kwargs):
+        """"""
+        super().__init__(*args, **kwargs)
+
+        for task, task_display in TASK_CATEGORY_CHOICES:
+            self.fields[task] = forms.IntegerField(
+                required=False,
+                label=f"{task} frequency (in days)",
+                widget=forms.NumberInput(attrs={"class": "form-control",
+                                                "placeholder": "Optional" if TASK_FREQUENCIES.get(
+                                                    task) is None else ""}),
+            )
+
+
+class PlantAndTaskGenericUpdateForm(BasePlantAndTaskGenericForm):
+    """
+    Form based on parent 'BasePlantAndTaskForm' to update Plant and PlantTaskFrequency objects at the same time.
+    https://forum.djangoproject.com/t/using-request-user-in-forms-py/19184/4 - pop z init?
+    """
+
+    def __init__(self, *args, **kwargs) -> None:
+        self.plant = kwargs.pop('plant', None)
+        super().__init__(*args, **kwargs)
+
+
+class PlantTaskGenericForm(forms.Form):
+    """
+    https://docs.djangoproject.com/en/4.2/ref/forms/fields/
+    """
+    task_type = forms.MultipleChoiceField(
+        choices=[(key, key) for key, value in TASK_CATEGORY_CHOICES],  # otherwise RadioSelect uses the display value
+        widget=forms.CheckboxSelectMultiple(attrs={"class": "form-check-input"}),
+    )
+
+    plants = forms.ModelMultipleChoiceField(
+        queryset=Plant.objects.filter(is_alive=True),
+        widget=forms.CheckboxSelectMultiple,
+    )

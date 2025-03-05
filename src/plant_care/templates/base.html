@@ -15,38 +15,46 @@
         <!-- Header -->
         <div id="header">
             <div class="container">
-                <h1><a href="/" id="logo">Plant Care Manager <em>by JB</em></a></h1>
+                <h1><a href="/" id="logo" class="text-decoration-none text-success">Plant Care Manager <em>by
+                    JB</em></a></h1>
                 <nav id="nav" class="nav d-flex justify-content-between align-items-center">
                     <div class="nav-left d-flex">
-                        <a href="/" class="nav-link">Home</a>
+                        <a href="/" class="nav-link text-dark">Home</a>
                         <div class="dropdown">
-                            <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <a href="#" class="nav-link text-dark dropdown-toggle" id="navbarDropdown"
+                               data-bs-toggle="dropdown" aria-expanded="false">
                                 Plants
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" href="{% url 'plant_care:plant-list' %}">Plant list</a></li>
-                                <li><a class="dropdown-item" href="{% url 'plant_care:plant-create' %}">Add new plant</a></li>
-                                <li><a class="dropdown-item" href="{% url 'plant_care:plant-graveyard-list' %}">Plant graveyard</a></li>
+                                <li><a class="dropdown-item" href="{% url 'plant_care:plant-list' %}">Plant list</a>
+                                </li>
+                                <li><a class="dropdown-item" href="{% url 'plant_care:plant-create' %}">Add new
+                                    plant</a></li>
+                                <li><a class="dropdown-item" href="{% url 'plant_care:plant-graveyard-list' %}">Plant
+                                    graveyard</a></li>
                             </ul>
                         </div>
 
                         <div class="dropdown">
-                            <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <a href="#" class="nav-link text-dark dropdown-toggle" id="navbarDropdown"
+                               data-bs-toggle="dropdown" aria-expanded="false">
                                 Groups
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" href="{% url 'plant_care:plant-group-list' %}">Group list</a></li>
-                                <li><a class="dropdown-item" href="{% url 'plant_care:plant-group-create' %}">Add new group</a></li>
+                                <li><a class="dropdown-item" href="{% url 'plant_care:plant-group-list' %}">Group
+                                    list</a></li>
+                                <li><a class="dropdown-item" href="{% url 'plant_care:plant-group-create' %}">Add new
+                                    group</a></li>
 
                             </ul>
                         </div>
-                        <a href="#" class="nav-link">Tasks</a>
-                        <a href="#" class="nav-link">History</a>
-                        <a href="#" class="nav-link">About</a>
+                        <a href="{% url 'plant_care:perform-tasks' %}" class="nav-link text-dark">Tasks</a>
+                        <a href="{% url 'plant_care:care-history' %}" class="nav-link text-dark">History</a>
+                        <a href="#" class="nav-link text-dark">About</a>
                     </div>
 
                     <div class="nav-right ml-auto">
-                        <a href="#" class="btn btn-sm btn-outline-success">Login</a>
+                        <a href="#" class="btn btn-sm btn-outline-success">Login??</a>
                     </div>
                 </nav>
             </div>
@@ -78,8 +86,9 @@
         <div id="footer">
             <div class="container">
                 <ul class="icons">
-                    <li><a href="#" class="icon brands fa-github"><span class="label">GitHub</span></a></li>
-                    <li><a href="#" class="icon brands fa-linkedin-in"><span class="label">LinkedIn</span></a></li>
+                    <li><a href="#" class="icon brands fa-github text-dark"><span class="label">GitHub</span></a></li>
+                    <li><a href="#" class="icon brands fa-linkedin-in text-dark"><span class="label">LinkedIn</span></a>
+                    </li>
                 </ul>
                 <div class="copyright">
                     <ul class="menu">

@@ -39,12 +39,12 @@
                             <td><a class="text-decoration-none text-dark"
                                    href="{% url 'plant_care:plant-detail' plant.pk %}">{{ plant.name }}</a></td>
                             <td><a class="text-decoration-none text-dark"
-                                   href="{% url 'plant_care:plant-group-detail' plant.group.pk %}">{{ plant.group }}</a>
+                                   href="{{plant.get_absolute_url}}">{{ plant.group }}</a>
                             </td>
                             <td>{{ plant.date|date:"d.m.Y" }}</td>
                             <td class="text-center">
                                 <a class="text-decoration-none"
-                                   href="{% url 'plant_care:plant-detail' plant.pk %}">🔍</a>
+                                   href="{{plant.get_absolute_url}}">🔍</a>
                             </td>
                             <td class="text-center">
                                 <a class="text-decoration-none"
