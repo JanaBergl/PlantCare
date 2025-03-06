@@ -155,4 +155,9 @@ input[type="checkbox"]:checked {
     border-color: #28a745;
 }
 
+.form-control:focus {
+    outline: 3px solid #28a745 !important; /* Zelená barva outline při focusu */
+    box-shadow: none; !important;/* Odstraní defaultní box-shadow u focusu */
+}
+
 

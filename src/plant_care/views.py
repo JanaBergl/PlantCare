@@ -1,3 +1,5 @@
+from tokenize import group
+
 from django.contrib import messages
 from django.db.models import QuerySet, Count, Q
 from django.http import HttpResponseRedirect, HttpResponse
@@ -8,7 +10,7 @@ from django.urls import reverse_lazy
 from plant_care.constants import TASK_CATEGORY_CHOICES, TASK_FREQUENCIES
 from plant_care.forms import PlantModelForm, PlantGroupModelForm, CauseOfDeathForm, \
     PlantTaskFrequencyGenericForm, PlantTaskGenericForm, \
-    PlantAndTaskGenericUpdateForm, BasePlantAndTaskGenericForm
+    PlantAndTaskGenericUpdateForm, BasePlantAndTaskGenericForm, PlantCareHistoryFilterForm
 from plant_care.models import Plant, PlantGroup, PlantGraveyard, PlantTaskFrequency, PlantCareHistory
 
 
@@ -37,9 +39,17 @@ class PlantListingView(ListView):
 
     def get_queryset(self) -> QuerySet:
         """
-        Overrides parent method get_queryset, filters only alive plants
+        Overrides parent method get_queryset, filters only alive plants.
+        Allows user to filter by name or group
         """
-        return Plant.objects.filter(is_alive=True)
+        queryset = Plant.objects.filter(is_alive=True)
+        search = self.request.GET.get("start_str")
+        if search:
+            queryset = queryset.filter(
+                Q(name__icontains=search) |
+                Q(group__group_name__icontains=search)
+            )
+        return queryset
 
 
 class PlantGroupListingView(ListView):
@@ -410,7 +420,7 @@ class PerformTaskView(FormView):
     """
     template_name = "plant_perform_tasks_list_page_template.html"
     form_class = PlantTaskGenericForm
-    success_url = reverse_lazy("plant_care:plant-list")
+    success_url = reverse_lazy("plant_care:care-history")
 
     def get_context_data(self, **kwargs):
         """"""
@@ -424,10 +434,6 @@ class PerformTaskView(FormView):
         plant_list = form.cleaned_data["plants"]
         print(f"Task Type: {task_types}")
         print(f"Selected Plants: {plant_list}")
-
-        if not plant_list:
-            form.add_error(None, "Must select at least one plant.")
-            return self.form_invalid(form)
 
         for plant in plant_list:
             for task_type in task_types:
@@ -447,4 +453,23 @@ class PlantCareHistoryListingView(ListView):
 
     def get_queryset(self):
         # https://docs.djangoproject.com/en/4.2/ref/models/querysets/#select-related
-        return PlantCareHistory.objects.select_related('plant').all()
+
+        queryset = PlantCareHistory.objects.select_related('plant').order_by("-task_date").all()
+        search = self.request.GET.get("start_str")
+        if search:
+            queryset = queryset.filter(
+                Q(task_type__icontains=search) |
+                Q(plant__group__group_name__istartswith=search) |
+                Q(plant__name__istartswith=search)
+            )
+        return queryset
+
+
+class PlantCareHistoryDeleteView(DeleteView):
+    """
+    View for deleting a plant care history log.
+    """
+    model = PlantCareHistory
+    success_url = reverse_lazy("plant_care:care-history")
+    template_name = "plant_care_history_delete_page_template.html"
+    context_object_name = "history"

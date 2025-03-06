@@ -3,13 +3,14 @@ from plant_care.views import HomePageTemplateView, PlantListingView, PlantDetail
     PlantGroupCreateView, PlantGroupListingView, PlantGroupDetailView, PlantGroupUpdateView, \
     PlantDeleteView, PlantGroupDeleteView, DeadPlantView, PlantGraveyardListingView, PlantsInGroupListingView, \
     plant_create_functional_view, PlantAndTaskFrequencyCreateGenericFormView, \
-    PlantAndTaskFrequencyUpdateGenericFormView, PerformTaskView, PlantCareHistoryListingView
+    PlantAndTaskFrequencyUpdateGenericFormView, PerformTaskView, PlantCareHistoryListingView, PlantCareHistoryDeleteView
 
 app_name = 'plant_care'
 
 urlpatterns = [
     path('', HomePageTemplateView.as_view(), name='home-page-app'),
     path('list/', PlantListingView.as_view(), name='plant-list'),
+    path('list/<str:start_str>/', PlantListingView.as_view(), name='plant-list-search'),
     path('group-list/', PlantGroupListingView.as_view(), name='plant-group-list'),
     path('plants-in-group-list/<int:pk>', PlantsInGroupListingView.as_view(), name='plants-in-group-list'),
     path('detail/<int:pk>/', PlantDetailView.as_view(), name='plant-detail'),
@@ -27,4 +28,7 @@ urlpatterns = [
     #path('update-view/<int:pk>/', PlantAndTaskFrequencyUpdateView.as_view(), name='plant_update-view'),
     path('perform-tasks/', PerformTaskView.as_view(), name='perform-tasks'),
     path('care-history/', PlantCareHistoryListingView.as_view(), name='care-history'),
+    path('care-history/<str:start_str>/', PlantCareHistoryListingView.as_view(), name='care-history-search'),
+    path('delete-care-history/<int:pk>', PlantCareHistoryDeleteView.as_view(), name='care-history-delete'),
+
 ]
