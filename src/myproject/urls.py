@@ -16,11 +16,18 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from myproject.views import home_page, HomePageRedirectView
+from myproject.views import HomePageRedirectView, AccountLoginView, AccountLoginConfirmationView, AccountLogoutView, \
+    AccountLogoutYesNoView, AccountLogoutConfirmationView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', HomePageRedirectView.as_view(), name='home-page'),
     path('plants/', include('plant_care.urls')),
 
+    # LOGIN / LOGOUT
+    path('login/', AccountLoginView.as_view(), name='login'),
+    path('login-confirmation/', AccountLoginConfirmationView.as_view(), name='login-confirmation'),
+    path('logout-confirmation/', AccountLogoutConfirmationView.as_view(), name='logout-confirmation'),
+    path('logout-yes-no/', AccountLogoutYesNoView.as_view(), name='logout-yes-no'),
+    path('logout/', AccountLogoutView.as_view(), name='logout'),
 ]

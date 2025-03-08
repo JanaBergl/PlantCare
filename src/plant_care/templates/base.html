@@ -12,54 +12,51 @@
 
 {% block bootstrap5_content %}
     <div id="page-wrapper">
-        <!-- Header -->
+    <!-- Header -->
         <div id="header">
-            <div class="container">
-                <h1><a href="/" id="logo" class="text-decoration-none text-success">Plant Care Manager <em>by
-                    JB</em></a></h1>
-                <nav id="nav" class="nav d-flex justify-content-between align-items-center">
-                    <div class="nav-left d-flex">
-                        <a href="/" class="nav-link text-dark">Home</a>
-                        <div class="dropdown">
-                            <a href="#" class="nav-link text-dark dropdown-toggle" id="navbarDropdown"
-                               data-bs-toggle="dropdown" aria-expanded="false">
-                                Plants
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" href="{% url 'plant_care:plant-list' %}">Plant list</a>
-                                </li>
-                                <li><a class="dropdown-item" href="{% url 'plant_care:plant-create' %}">Add new
-                                    plant</a></li>
-                                <li><a class="dropdown-item" href="{% url 'plant_care:plant-graveyard-list' %}">Plant
-                                    graveyard</a></li>
-                            </ul>
-                        </div>
-
-                        <div class="dropdown">
-                            <a href="#" class="nav-link text-dark dropdown-toggle" id="navbarDropdown"
-                               data-bs-toggle="dropdown" aria-expanded="false">
-                                Groups
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" href="{% url 'plant_care:plant-group-list' %}">Group
-                                    list</a></li>
-                                <li><a class="dropdown-item" href="{% url 'plant_care:plant-group-create' %}">Add new
-                                    group</a></li>
-
-                            </ul>
-                        </div>
-                        <a href="{% url 'plant_care:perform-tasks' %}" class="nav-link text-dark">Tasks</a>
-                        <a href="{% url 'plant_care:care-history' %}" class="nav-link text-dark">History</a>
-                        <a href="#" class="nav-link text-dark">About</a>
+            <div class="container-fluid d-flex justify-content-between align-items-center py-3">
+                <h4 class="mb-0">
+                    <a href="/" id="logo" class="text-decoration-none text-dark">
+                        <img src="{% static 'img/favicon.ico' %}" alt="Plant Care Logo" class="img-fluid" style="max-height: 35px;">  Plant Care
+                    </a>
+                </h4>
+                <nav id="nav" class="nav">
+                    <a href="/" class="nav-link text-dark">Home</a>
+                    <div class="dropdown">
+                        <a href="{% url 'plant_care:plant-list' %}" class="nav-link text-dark dropdown-toggle" id="navbarDropdown"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            Plants
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="{% url 'plant_care:plant-list' %}">Plant list</a></li>
+                            <li><a class="dropdown-item" href="{% url 'plant_care:plant-create' %}">Add new plant</a></li>
+                            <li><a class="dropdown-item" href="{% url 'plant_care:plant-graveyard-list' %}">Plant graveyard</a></li>
+                        </ul>
                     </div>
-
-                    <div class="nav-right ml-auto">
-                        <a href="#" class="btn btn-sm btn-outline-success">Login??</a>
+                    <div class="dropdown">
+                        <a href="#" class="nav-link text-dark dropdown-toggle" id="navbarDropdown"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            Groups
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="{% url 'plant_care:plant-group-list' %}">Group list</a></li>
+                            <li><a class="dropdown-item" href="{% url 'plant_care:plant-group-create' %}">Add new group</a></li>
+                        </ul>
                     </div>
+                    <div class="dropdown">
+                        <a href="#" class="nav-link text-dark dropdown-toggle" id="navbarDropdown"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            Tasks
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="{% url 'plant_care:perform-tasks' %}">Plant Care</a></li>
+                            <li><a class="dropdown-item" href="{% url 'plant_care:warnings' %}">Warnings</a></li>
+                        </ul>
+                    </div>
+                    <a href="{% url 'plant_care:care-history' %}" class="nav-link text-dark">History</a>
                 </nav>
             </div>
         </div>
-
         <!-- Banner -->
         {% block banner %}{% endblock %}
 
@@ -72,8 +69,7 @@
                 {% endfor %}
             </div>
         {% endif %}
-
-        <!-- Main content -->
+           <!-- Main content -->
         <section class="wrapper style1">
             <div class="container">
                 {% block content %}
@@ -84,20 +80,37 @@
 
         <!-- Footer -->
         <div id="footer">
-            <div class="container">
-                <ul class="icons">
-                    <li><a href="#" class="icon brands fa-github text-dark"><span class="label">GitHub</span></a></li>
-                    <li><a href="#" class="icon brands fa-linkedin-in text-dark"><span class="label">LinkedIn</span></a>
-                    </li>
-                </ul>
-                <div class="copyright">
-                    <ul class="menu">
-                        <li>Plant Care Manager</li>
-                    </ul>
+            <div class="container-fluid d-flex justify-content-between align-items-center">
+                <div>
+                    <a href="#"><img src="{% static 'img/github.svg' %}" alt="GitHub" style="width: 48px; height: 48px;"></a>
+                </div>
+
+                <div class="d-flex justify-content-start align-items-center me-3 ms-3">
+                    <div style="margin-right: 15px;">
+                        User:&nbsp;&nbsp;
+                        {% if user.is_authenticated %}
+                            {{ user }}
+                        {% else %}
+                            Not logged in
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'logout-yes-no' %}?userid={{ user.pk }}">
+                                <button class="btn-sm btn-animace">Logout</button>
+                            </a>
+                        {% else %}
+                            <a href="{% url 'login' %}">
+                                <button class="btn-sm btn-animace">Login</button>
+                            </a>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+
+</div>
 
     <!-- Scripts -->
     {% block extra_scripts %}

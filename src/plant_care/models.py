@@ -1,5 +1,5 @@
 from django.urls import reverse_lazy
-from django.utils.timezone import now
+import datetime
 from django.db import models
 from plant_care.constants import TASK_CATEGORY_CHOICES, TASK_FREQUENCIES, CAUSE_OF_DEATH_CHOICES
 
@@ -46,12 +46,12 @@ class Plant(models.Model):
     """
     name = models.CharField(max_length=100, unique=True)
     group = models.ForeignKey(PlantGroup, on_delete=models.SET_NULL, null=True, blank=True, related_name="plants")
-    date = models.DateField(default=now)
+    date = models.DateField(default=datetime.date.today)
     notes = models.TextField(null=True, blank=True)
     is_alive = models.BooleanField(default=True)
 
     def __str__(self) -> str:
-        return f"Plant - {self.name}"
+        return f"{self.name}"
 
     def __repr__(self) -> str:
         return f"Plant(name={self.name}, date={self.date}, group={self.group}, notes={self.notes}, is_alive={self.is_alive})"
@@ -92,13 +92,13 @@ class PlantCareHistory(models.Model):
 
     plant = models.ForeignKey(Plant, on_delete=models.CASCADE)
     task_type = models.CharField(max_length=25, choices=TASK_CATEGORY_CHOICES)
-    task_date = models.DateTimeField(default=now)  # formát
+    task_date = models.DateTimeField(default=datetime.datetime.now)
 
     def __str__(self) -> str:
         return f"{self.plant.name} has been {self.get_task_type_display()} on {self.task_date.strftime('%d-%m-%Y %H:%M')}"
 
     def __repr__(self) -> str:
-        return f"PlantCareHistory(plant={self.plant.id}, task_type='{self.task_type}', task_date={self.task_date!r})"
+        return f"PlantCareHistory(plant={self.plant.id}, task_type='{self.task_type}', task_date={self.task_date})"
 
     def formatted_task_date(self) -> str:
         """
@@ -142,7 +142,7 @@ class PlantTaskFrequency(models.Model):
     frequency = models.IntegerField(null=True, blank=True)
 
     def __str__(self) -> str:
-        return f"{self.plant.name} should be {self.get_task_type_display()} every {self.frequency} days" if self.frequency else f"{self.plant.name} has no specific schedule for {self.get_task_type_display()}"
+        return f"{self.plant.name} should be {self.get_task_type_display()} every {self.frequency} days" if self.frequency else f"{self.plant.name} has no specific schedule for {self.task_type.lower()}"
 
     def __repr__(self) -> str:
         return f"PlantTaskFrequency(plant={self.plant.name}, task_type={self.task_type}, frequency={self.frequency})"
@@ -162,7 +162,7 @@ class PlantGraveyard(models.Model):
     """
 
     plant = models.OneToOneField(Plant, on_delete=models.CASCADE)
-    date_of_death = models.DateField(auto_now_add=True)  # formát
+    date_of_death = models.DateField(auto_now_add=True)
     cause_of_death = models.CharField(max_length=50, blank=True, null=True, choices=CAUSE_OF_DEATH_CHOICES,
                                       default='unknown')
 

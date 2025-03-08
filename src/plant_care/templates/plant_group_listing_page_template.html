@@ -22,8 +22,8 @@
                        style="width: 75%">
                     <thead class="table-success">
                     <tr>
-                        <th style="width: 40%">Group name</th>
-                        <th style="width: 30%">Number of plants</th>
+                        <th><a class="text-decoration-none text-dark" href="?sort={% if request.GET.sort == 'group_name' %}-group_name{% else %}group_name{% endif %}">Group name</a></th>
+                        <th><a class="text-decoration-none text-dark" href="?sort={% if request.GET.sort == 'num_plants' %}-num_plants{% else %}num_plants{% endif %}">Number of plants</a></th>
                         <th style="width: 10%" class="text-center">Detail</th>
                         <th style="width: 10%" class="text-center">Update</th>
                         <th style="width: 10%" class="text-center">Delete</th>
@@ -56,7 +56,7 @@
                 </table>
             </div>
             <div class="d-flex justify-content-center mt-4">
-                <a href="{% url 'plant_care:plant-group-create' %}" class="btn me-2 btn-outline-success">Add new
+                <a href="{% url 'plant_care:plant-group-create' %}" class="btn me-2 btn-success btn-animace">Add new
                     group</a>
             </div>
         </div>
@@ -64,7 +64,7 @@
         <p class="text-center mt-5">There are no groups in the database.</p>
         <div class="container">
             <div class="d-flex justify-content-center mb-2">
-                <a href="{% url 'plant_care:plant-group-create' %}" id="a-button" class="btn btn-outline-success"><b>Create
+                <a href="{% url 'plant_care:plant-group-create' %}" id="a-button" class="btn btn-success btn-animace"><b>Create
                     a group</b></a>
             </div>
         </div>

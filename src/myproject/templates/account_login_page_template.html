@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load bootstrap5 %}
+{% load static %}
+
+{% block bootstrap5_title %}Login{% endblock %}
+
+
+{% block content %}
+    <div class="container d-flex justify-content-center align-items-center" style="min-height: 70vh;">
+        <div class="d-flex flex-column align-items-center w-100" style="max-width: 500px;">
+            <h3 class="text-center text-success mb-4">Welcome to Plant Care App! Log in to start managing your plants.</h3>
+            <form method="post" action=".">
+                {% csrf_token %}
+                {% bootstrap_form form %}
+                <br><br>
+                <button type="submit" class="btn btn-success btn-animace w-100">Login</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

@@ -9,14 +9,18 @@
 {% block banner %}
     <section id="banner">
         <header>
-            <h2>Hello, {% if user_name %}{{ user_name }}{% else %}user!{% endif %} Welcome to TBD... app</h2>
-            <p>Track your plants, plan tasks, and check care history</p>
+            <h2>Hello, {% if user_name %}<em>{{ user_name }}</em>!{% else %}user!{% endif %} Welcome to Plant Care App</h2>
+            {% if overdue_plant_count %}
+                <h5><a href="{% url 'plant_care:warnings' %}" class="text-decoration-none text-dark">There are <b class="text-success">{{ overdue_plant_count }}</b> plants requiring your attention!</a></h5>
+            {% else %}
+                <p>Track your plants, plan tasks, and check care history</p>
+            {% endif %}
         </header>
     </section>
 {% endblock %}
 
 {% block content %}
-    <div class="row">
+    <div class="row mt-3">
         <section class="col-4 col-12-narrower">
             <div class="box highlight">
                 <a href="{% url 'plant_care:plant-list' %}" class="text-decoration-none text-dark">

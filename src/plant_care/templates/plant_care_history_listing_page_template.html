@@ -10,17 +10,14 @@
             <div class="d-flex flex-column align-items-center">
                 <br>
                 <div class="d-flex justify-content-center w-75 mb-4">
-                    <p class="fs-3 m-0 text-center">Care History</p>
+                    <p class="fs-3 m-0 text-center">🌱 Care History 🌱</p>
                 </div>
 
                 <div class="d-flex justify-content-end w-75 mb-4">
-                    <form method="get" action="
-
-
-                            {% if request.GET.start_str %}{% url 'plant_care:care-history-search' request.GET.start_str %}{% else %}{% url 'plant_care:care-history' %}{% endif %}"
+                    <form method="get" action="{% url 'plant_care:care-history' %}"
                           class="d-flex" style="width: auto;">
-                        <input type="text" name="start_str" placeholder="Search task/plant/group"
-                               value="{{ request.GET.start_str }}" class="text-center form-control">
+                        <input type="text" name="filter" placeholder="Search task/plant/group"
+                               value="{{ request.GET.filter }}" class="text-center form-control">
                         <button type="submit" class="btn ms-2 btn-animace">🔎</button>
                     </form>
                 </div>
@@ -34,7 +31,8 @@
                     {% for log in history %}
                         <tr>
                             <td class="text-center">
-                                "{{ log.plant.name }}" ("{{ log.plant.group }}") was
+                                "<a class="text-decoration-none text-dark" href="{{ log.plant.get_absolute_url }}">{{ log.plant.name }}"</a>
+                                <a class="text-decoration-none text-dark" href="{{ log.plant.group.get_absolute_url }}">("{{ log.plant.group }}")</a> was
                                 <b>{{ log.get_task_type_display }}</b> on {{ log.formatted_task_date }}.
                             </td>
                             <td class="text-center">
@@ -52,7 +50,7 @@
         <div class="container">
             <div class="d-flex justify-content-center mb-2">
                 <a href="{% url 'plant_care:perform-tasks' %}" id="a-button"
-                   class="btn btn-outline-success"><b>Tasks</b></a>
+                   class="btn btn-outline-success btn-animace"><b>Tasks</b></a>
             </div>
         </div>
     {% endif %}

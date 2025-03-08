@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load bootstrap5 %}
+{% load static %}
+
+{% block bootstrap5_title %}Logout{% endblock %}
+
+
+{% block content %}
+    <div class="container d-flex justify-content-center align-items-center" style="min-height: 70vh;">
+        <div class="d-flex flex-column align-items-center w-100">
+            {% if user %}
+                <h3 class="text-center text-success mb-4">Logout successful. See you soon, {{ user.username }}!</h3>
+                <br>
+                <a href="{% url 'login' %}"><button class="btn-animace">Login</button></a>
+            {% else %}
+                <h3 class="text-center text-success mb-4" >Error - User not found!</h3>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

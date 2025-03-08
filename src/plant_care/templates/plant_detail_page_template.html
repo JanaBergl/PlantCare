@@ -41,15 +41,13 @@
                     <th scope="row">Date of purchase</th>
                     <td>{{ plant.date|date:"d. m. Y" }}</td>
                 </tr>
-                <tr>
-                    <th scope="row">Notes</th>
-                    <td>{{ plant.notes }}</td>
-                </tr>
-                {% if plant.is_alive %}
+                {% if plant.notes %}
                     <tr>
-                        <th scope="row">History</th>
-                        <td>doplnit!</td>
+                        <th scope="row">Notes</th>
+                        <td>{{ plant.notes }}</td>
                     </tr>
+                {% endif %}
+                {% if plant.is_alive %}
                     {% if task_frequencies %}
                         {% for task in task_frequencies %}
                             {% if task.frequency %}
@@ -65,6 +63,10 @@
                             <td>No frequencies set</td>
                         </tr>
                     {% endif %}
+                    <tr>
+                        <th scope="row">History</th>
+                        <td><a class="text-decoration-none" href="{% url 'plant_care:care-history'%}?filter={{ plant.name }}">🔍</a></td>
+                    </tr>
                 {% else %}
                     <tr>
                         <th scope="row">Time of death</th>

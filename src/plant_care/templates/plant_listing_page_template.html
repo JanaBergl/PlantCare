@@ -19,10 +19,10 @@
 
                 <div class="d-flex justify-content-end w-75">
                     <form method="get" class="d-flex" style="width: auto;" action="
-                        {% if request.GET.start_str %}{% url 'plant_care:plant-list-search' request.GET.start_str %}
+                        {% if request.GET.filter %}{% url 'plant_care:plant-list-search' request.GET.filter %}
                         {% else %}{% url 'plant_care:plant-list' %}{% endif %}">
-                        <input type="text" name="start_str" placeholder="Search plant or group"
-                               value="{{ request.GET.start_str }}" class="text-center form-control">
+                        <input type="text" name="filter" placeholder="Search plant or group"
+                               value="{{ request.GET.filter }}" class="text-center form-control">
                         <button type="submit" class="btn ms-2 btn-animace">🔎</button>
                     </form>
                 </div>
@@ -36,9 +36,9 @@
                    style="width: 75%">
                 <thead class="table-success">
                 <tr>
-                    <th style="width: 25%">Name</th>
-                    <th style="width: 25%">Group</th>
-                    <th style="width: 25%">Purchase Date</th>
+                    <th style="width: 25%"><a class="text-decoration-none text-dark" href="?sort={% if request.GET.sort == "name" %}-name{% else %}name{% endif %}">Name</a></th>
+                    <th style="width: 25%"><a class="text-decoration-none text-dark" href="?sort={% if request.GET.sort == "group" %}-group{% else %}group{% endif %}">Group</a></th>
+                    <th style="width: 25%"><a class="text-decoration-none text-dark" href="?sort={% if request.GET.sort == "date" %}-date{% else %}date{% endif %}">Purchase Date</a></th>
                     <th class="text-center">Detail</th>
                     <th class="text-center">Update</th>
                     <th class="text-center">Delete</th>
@@ -75,9 +75,9 @@
             </table>
         </div>
         <div class="d-flex justify-content-center mt-4">
-            <a href="{% url 'plant_care:plant-create' %}" class="btn me-2 btn-outline-success">Add new plant</a>
+            <a href="{% url 'plant_care:plant-create' %}" class="btn me-2 btn-success btn-animace">Add new plant</a>
         </div>
-        </div>
+
     {% else %}
         {% if group %}
             <p class="text-center mt-5">There are no plants in the '{{ group.group_name }}' group.</p>
@@ -86,8 +86,8 @@
         {% endif %}
         <div class="container">
             <div class="d-flex justify-content-center mb-2">
-                <a href="{% url 'plant_care:plant-create' %}" id="a-button" class="btn btn-outline-success"><b>Add new
-                    plant</b></a>
+                <a href="{% url 'plant_care:plant-create' %}" id="a-button" class="btn btn-success btn-animace">Add new
+                    plant</a>
             </div>
         </div>
     {% endif %}

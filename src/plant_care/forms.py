@@ -1,7 +1,7 @@
 from django import forms
 from datetime import date
 from plant_care.constants import CAUSE_OF_DEATH_CHOICES, TASK_CATEGORY_CHOICES, TASK_FREQUENCIES
-from plant_care.models import Plant, PlantGroup, PlantTaskFrequency
+from plant_care.models import Plant, PlantGroup, PlantTaskFrequency, PlantCareHistory
 
 
 class PlantModelForm(forms.ModelForm):
@@ -98,72 +98,6 @@ class PlantTaskFrequencyGenericForm(forms.Form):
                 )
 
 
-class PlantAndTaskGenericForm(forms.Form):
-    """
-    Generic form to create and update Plant and PlantTaskFrequency objects at once.
-    """
-    name = forms.CharField(
-        label='Name',
-        max_length=50,
-        widget=forms.TextInput(attrs={'class': 'form-control'}),
-    )
-    group = forms.ModelChoiceField(
-        label='Group',
-        queryset=PlantGroup.objects.all(),
-        widget=forms.Select(attrs={'class': 'form-control'}),
-        required=False,
-    )
-    date = forms.DateField(
-        label='Date of purchase',
-        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-        initial=date.today,
-
-    )
-    notes = forms.CharField(
-        label='Notes',
-        widget=forms.Textarea(attrs={'class': 'form-control'}),
-        required=False,
-    )
-
-    def __init__(self, *args, **kwargs) -> None:
-        """
-        Initializes the form with optional plant data for update view.
-        If a 'plant' instance is provided (update view), the form initializes task frequencies with existing values or default values from 'TASK_FREQUENCIES'.
-        If not (create view), initializes tasks with default values.
-        """
-        self.plant = kwargs.pop("plant",
-                                None)  # __init__ vadil neocekavany argument 'plant', nic jineho nefungovalo. 'plant' potrebuju dale, ale nesmi zustat v init
-        super().__init__(*args, **kwargs)
-
-        if self.plant:  # if update view
-            for task, task_display in TASK_CATEGORY_CHOICES:
-                existing_task = self.plant.task_frequencies.filter(task_type=task).first()
-                if existing_task:
-                    initial_value = existing_task.frequency
-                else:
-                    initial_value = TASK_FREQUENCIES.get(task, None)
-
-                self.fields[task] = forms.IntegerField(
-                    required=False,
-                    initial=initial_value if initial_value is not None else TASK_FREQUENCIES.get(task, None),
-                    label=f"{task} frequency (in days)",
-                    widget=forms.NumberInput(
-                        attrs={'class': 'form-control', 'placeholder': 'Optional' if initial_value is None else None})
-                )
-        else:
-            # if create view
-            for task, task_display in TASK_CATEGORY_CHOICES:
-                initial_value = TASK_FREQUENCIES.get(task, None)
-
-                self.fields[task] = forms.IntegerField(
-                    required=False,
-                    initial=initial_value,
-                    label=f"{task} frequency (in days)",
-                    widget=forms.NumberInput(
-                        attrs={'class': 'form-control', 'placeholder': 'Optional' if initial_value is None else None})
-                )
-
-
 class BasePlantAndTaskGenericForm(forms.Form):
     """
     Base form for creating and updating Plant and PlantTaskFrequency objects at the same time.
@@ -191,7 +125,9 @@ class BasePlantAndTaskGenericForm(forms.Form):
     )
 
     def __init__(self, *args, **kwargs):
-        """"""
+        """
+        Dynamically creates fields for user to fill out based on every task_type in TASK_CATEGORY_CHOICES.
+        """
         super().__init__(*args, **kwargs)
 
         for task, task_display in TASK_CATEGORY_CHOICES:
@@ -210,6 +146,11 @@ class PlantAndTaskGenericUpdateForm(BasePlantAndTaskGenericForm):
     https://forum.djangoproject.com/t/using-request-user-in-forms-py/19184/4 - pop z init?
     """
 
+    # BEZ POP A PRI POUZIVANI GET_INITIAL V UPDATE VZDY CHYBA TypeError at /plants/update-plant/22/
+    # BaseForm.__init__() got an unexpected keyword argument 'plant'
+    # Request Method:	POST
+    # -> jedine co zatim funguje je toto s .pop
+
     def __init__(self, *args, **kwargs) -> None:
         self.plant = kwargs.pop('plant', None)
         super().__init__(*args, **kwargs)
@@ -217,10 +158,10 @@ class PlantAndTaskGenericUpdateForm(BasePlantAndTaskGenericForm):
 
 class PlantTaskGenericForm(forms.Form):
     """
-    https://docs.djangoproject.com/en/4.2/ref/forms/fields/
+    Generic form for performing plant care tasks - creating PlantCareHistory records for selected plants.
     """
     task_type = forms.MultipleChoiceField(
-        choices=[(key, key) for key, value in TASK_CATEGORY_CHOICES],  # otherwise RadioSelect uses the display value
+        choices=[(key, key) for key, value in TASK_CATEGORY_CHOICES],  # jinak z choice bere vzdy display
         widget=forms.CheckboxSelectMultiple(attrs={"class": "form-check-input"}),
     )
 
@@ -228,3 +169,38 @@ class PlantTaskGenericForm(forms.Form):
         queryset=Plant.objects.filter(is_alive=True),
         widget=forms.CheckboxSelectMultiple,
     )
+
+
+class PlantCareHistoryModelForm(forms.ModelForm):
+    """
+
+    """
+
+    class Meta:
+        model = PlantCareHistory
+
+        fields = [
+            "task_type",
+            "task_date",
+        ]
+
+        labels = {
+            "task_type": "Task",
+            "task_date": "Date",
+        }
+
+        widgets = {
+            "task_type": forms.Select(attrs={"class": "form-control"}),
+            "task_date": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
+
+        }
+
+    def __init__(self, *args, **kwargs):
+        """
+
+        """
+        plant = kwargs.pop('plant', None)
+        super().__init__(*args, **kwargs)
+
+        if plant:
+            self.instance.plant = plant

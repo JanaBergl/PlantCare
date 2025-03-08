@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load bootstrap5 %}
+{% load static %}
+
+{% block bootstrap5_title %}Login Confirmation{% endblock %}
+
+{% block content %}
+    <div class="container d-flex justify-content-center align-items-center" style="min-height: 70vh;">
+        <div class="d-flex flex-column align-items-center w-100" style="max-width: 500px;">
+            <h3 class="text-center text-success mb-4">Login successful! Welcome, {{ user.username }}. You will be redirected to the app home page...</h3>
+            <div class="text-center">
+                <p>If you are not redirected, <a href="{% url 'plant_care:home-page-app' %}" class="text-success">click here</a> to go to the home page.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // after 3 seconds redirect to home page
+        setTimeout(function() {
+            window.location.href = '/';
+        }, 3000);
+    </script>
+{% endblock %}

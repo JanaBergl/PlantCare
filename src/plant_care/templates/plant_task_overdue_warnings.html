@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load bootstrap5 %}
+
+
+
+{% block bootstrap5_title %}Care Warnings{% endblock %}
+
+
+{% block content %}
+    {% if warnings %}
+        <div class="container mt-3">
+            <div class="d-flex flex-column align-items-center">
+                <br>
+                <p class="fs-3 text-center">❗ Overdue Care Tasks ❗</p>
+                <br>
+
+            </div>
+            <div class="d-flex justify-content-center align-items-center mb-4">
+
+                <table class="table table-striped table-hover table-bordered table-sm table-responsive"
+                       style="width: 75%">
+                    <thead class="table-success">
+                    <tr>
+                        <th>Plant</th>
+                        <th>Group</th>
+                        <th>Task</th>
+                        <th>Days overdue</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for warning in warnings %}
+                        <tr>
+                            <td><a class="text-decoration-none text-dark"
+                                   href="{{ warning.plant.get_absolute_url }}">{{ warning.plant.name }}</a>
+                            </td>
+                            <td><a class="text-decoration-none text-dark"
+                                   href="{{ warning.plant.group.get_absolute_url }}">{{ warning.plant.group.group_name }}</a>
+                            </td>
+                            <td><strong>{{ warning.task_type }}</strong></td>
+                            <td class="text-danger">{{ warning.days_since_task }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex justify-content-center mt-4">
+                <a href="{% url 'plant_care:perform-tasks' %}" class="btn me-2 btn-success btn-animace"> Plant Tasks</a>
+            </div>
+        </div>
+    {% else %}
+        <p class="text-center mt-5">No plant needs care at the moment. Great job!</p>
+        <div class="container">
+            <div class="d-flex justify-content-center mb-2">
+                <a href="{% url 'plant_care:care-history' %}" class="btn btn-outline-success btn-animace"><b>Care History</b></a>
+            </div>
+        </div>
+    {% endif %}
+
+{% endblock %}

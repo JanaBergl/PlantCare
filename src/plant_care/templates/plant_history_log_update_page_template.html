@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load bootstrap5 %}
+
+
+
+{% block bootstrap5_title %}Update History Log{% endblock %}
+
+{% block content %}
+    <div class="container mt-5 mb-5">
+        <h1 class="text-center">Update care history log for {{ plant.name }}</h1>
+        <div class="col-md-6 mx-auto">
+            <form method="post" action="{% url 'plant_care:care-history-update' pk=object.pk %}">
+                {% csrf_token %}
+                {% bootstrap_form form %}
+                <br>
+                <div class="d-flex justify-content-center">
+                    <button type="submit" class="btn btn-success btn-animace">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

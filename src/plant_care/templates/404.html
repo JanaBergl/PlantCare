@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load bootstrap5 %}
+
+{% block bootstrap5_title %}Page Not Found{% endblock %}
+
+{% block content %}
+   <div class="container d-flex justify-content-center align-items-center" style="min-height: 70vh;">
+        <div class="d-flex flex-column align-items-center w-100" style="max-width: 500px;">
+            <div class="box highlight">
+              <h1 class="text-center text-success mb-4">Oops! Page not found.</h1>
+                <p class="text-center">Sorry, the page you're looking for does not exist...</p>
+                <p class="text-center">Don't worry, you can go back to the <strong><a href="{% url 'home-page' %}" class="text-decoration-none text-success">home page</a></strong> and start again.</p>
+                <br>
+                <a href="{% url 'home-page' %}" class="btn btn-success btn-lg rounded d-flex justify-content-center align-items-center btn-animace" >
+                    <span class="font-weight-bold"> 🪴HOME🪴</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

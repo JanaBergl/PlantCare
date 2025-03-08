@@ -55,21 +55,17 @@
                                 const selectAllCheckbox = document.getElementById("select_all");
                                 const plantCheckboxes = document.querySelectorAll("input[name='plants']");
 
-                                // Funkce pro změnu stavu všech checkboxů
                                 selectAllCheckbox.addEventListener("change", function() {
                                     plantCheckboxes.forEach(function(checkbox) {
-                                        checkbox.checked = selectAllCheckbox.checked; // Nastaví všechny checkboxy podle "Select All"
+                                        checkbox.checked = selectAllCheckbox.checked;
                                     });
                                 });
 
-                                // Funkce pro kontrolu stavu "Select All"
                                 plantCheckboxes.forEach(function(checkbox) {
                                     checkbox.addEventListener("change", function() {
-                                        // Pokud jsou všechny checkboxy zaškrtnuté, "Select All" se zaškrtne
                                         if (Array.from(plantCheckboxes).every(cb => cb.checked)) {
                                             selectAllCheckbox.checked = true;
                                         }
-                                        // Pokud nějaký checkbox není zaškrtnutý, "Select All" se odškrtne
                                         else {
                                             selectAllCheckbox.checked = false;
                                         }
@@ -101,7 +97,7 @@
         <p class="text-center mt-5">There are no plants in the database.</p>
         <div class="container">
             <div class="d-flex justify-content-center mb-2">
-                <a href="{% url 'plant_care:plant-create' %}" id="a-button" class="btn btn-outline-success"><b>Add new
+                <a href="{% url 'plant_care:plant-create' %}" class="btn btn-success btn-animace"><b>Add new
                     plant</b></a>
             </div>
         </div>
