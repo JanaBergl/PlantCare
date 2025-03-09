@@ -9,7 +9,9 @@
         <div class="container mt-3">
         <div class="d-flex flex-column align-items-center">
             <br>
+        <div class="d-flex justify-content-center w-75 mb-1">
             <p class="fs-3 text-center">🪴 Select plant and task 🪴</p>
+        </div>
             <br>
         </div>
         <form method="post" action="{% url 'plant_care:perform-tasks' %}">
@@ -50,30 +52,7 @@
 
 
                     {% endfor %}
-                        <script>
-                            document.addEventListener("DOMContentLoaded", function() {
-                                const selectAllCheckbox = document.getElementById("select_all");
-                                const plantCheckboxes = document.querySelectorAll("input[name='plants']");
-
-                                selectAllCheckbox.addEventListener("change", function() {
-                                    plantCheckboxes.forEach(function(checkbox) {
-                                        checkbox.checked = selectAllCheckbox.checked;
-                                    });
-                                });
-
-                                plantCheckboxes.forEach(function(checkbox) {
-                                    checkbox.addEventListener("change", function() {
-                                        if (Array.from(plantCheckboxes).every(cb => cb.checked)) {
-                                            selectAllCheckbox.checked = true;
-                                        }
-                                        else {
-                                            selectAllCheckbox.checked = false;
-                                        }
-                                    });
-                                });
-                            });
-                        </script>
-
+                    <script src="{% static 'js/select_all_checkbox.js' %}"></script>
 
                     </tbody>
                 </table>
@@ -87,7 +66,11 @@
                     </div>
                 {% endfor %}
             </div>
-
+                <div class="d-flex justify-content-center mt-4">
+                    <div class="w-auto">
+                        {{ form.task_date }}
+                    </div>
+            </div>
             <div class="d-flex justify-content-center mt-4 mb-4">
                 <button type="submit" class="btn btn-success btn-animace mb-4">Submit</button>
             </div>

@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.urls import reverse_lazy
 import datetime
 from django.db import models
@@ -40,11 +41,19 @@ class PlantGroup(models.Model):
         return reverse_lazy("plant_care:plant-group-detail", kwargs={"pk": self.id})
 
 
+def validate_plant_unique_name(value):
+    """
+    Validates that a plant name is unique amongst living plants (is_alive=True)
+    """
+    if Plant.objects.filter(is_alive=True, name=value).first():
+        raise ValidationError("Plant with this name already exists.")
+
+
 class Plant(models.Model):
     """
     Represents a plant, with attributes: name, group, date of purchase, notes, and its current status (alive or not).
     """
-    name = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=100, validators=[validate_plant_unique_name])
     group = models.ForeignKey(PlantGroup, on_delete=models.SET_NULL, null=True, blank=True, related_name="plants")
     date = models.DateField(default=datetime.date.today)
     notes = models.TextField(null=True, blank=True)

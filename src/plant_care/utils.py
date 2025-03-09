@@ -1,4 +1,6 @@
 import datetime
+
+from django.core.exceptions import ValidationError
 from plant_care.constants import TASK_CATEGORY_CHOICES
 from plant_care.models import PlantCareHistory, Plant
 
@@ -22,7 +24,7 @@ def show_care_warnings() -> list:
 
             last_log = PlantCareHistory.objects.filter(plant=plant, task_type=task_type).order_by('-task_date').first()
             if last_log:
-                days_since_task = (today -last_log.task_date.date()).days
+                days_since_task = (today - last_log.task_date.date()).days
 
                 if days_since_task >= days_allowed:
                     overdue_tasks.append({

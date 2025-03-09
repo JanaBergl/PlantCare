@@ -12,7 +12,7 @@
         <div class="container mt-3">
             <div class="d-flex flex-column align-items-center">
                 <br>
-                <p class="fs-3 text-center">❗ Overdue Care Tasks ❗</p>
+                <p class="view-header fs-3 text-center">❗ Overdue Care Tasks ❗</p>
                 <br>
 
             </div>
@@ -22,10 +22,10 @@
                        style="width: 75%">
                     <thead class="table-success">
                     <tr>
-                        <th>Plant</th>
-                        <th>Group</th>
-                        <th>Task</th>
-                        <th>Days overdue</th>
+                        <th><a class="text-decoration-none text-dark" href="?sort={% if request.GET.sort == "plant" %}-plant{% else %}plant{% endif %}">Plant</a></th>
+                        <th><a class="text-decoration-none text-dark" href="?sort={% if request.GET.sort == "group" %}-group{% else %}group{% endif %}">Group</a></th>
+                        <th><a class="text-decoration-none text-dark" href="?sort={% if request.GET.sort == "task" %}-task{% else %}task{% endif %}">Task</a></th>
+                        <th><a class="text-decoration-none text-dark" href="?sort={% if request.GET.sort == "days_overdue" %}-days_overdue{% else %}days_overdue{% endif %}">Days overdue</a></th>
                     </tr>
                     </thead>
                     <tbody>

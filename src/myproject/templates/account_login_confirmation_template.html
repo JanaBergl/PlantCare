@@ -14,10 +14,5 @@
         </div>
     </div>
 
-    <script>
-        // after 3 seconds redirect to home page
-        setTimeout(function() {
-            window.location.href = '/';
-        }, 3000);
-    </script>
+    <script src="{% static 'js/redirect_homepage.js' %}"></script>
 {% endblock %}

@@ -8,7 +8,7 @@
 
 {% block content %}
     <div class="container mt-5 mb-5">
-        <h1 class="text-center">Update care history log for {{ plant.name }}</h1>
+        <h1 class="view-header text-center">Update care history log for {{ plant.name }}</h1>
         <div class="col-md-6 mx-auto">
             <form method="post" action="{% url 'plant_care:care-history-update' pk=object.pk %}">
                 {% csrf_token %}

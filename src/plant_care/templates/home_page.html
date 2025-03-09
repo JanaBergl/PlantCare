@@ -9,9 +9,11 @@
 {% block banner %}
     <section id="banner">
         <header>
-            <h2>Hello, {% if user_name %}<em>{{ user_name }}</em>!{% else %}user!{% endif %} Welcome to Plant Care App</h2>
-            {% if overdue_plant_count %}
-                <h5><a href="{% url 'plant_care:warnings' %}" class="text-decoration-none text-dark">There are <b class="text-success">{{ overdue_plant_count }}</b> plants requiring your attention!</a></h5>
+            <h2 class="home-page-welcome">Hello, {% if user_name %}<em class="text-success">{{ user_name }}</em>!{% else %}user!{% endif %}
+                Welcome to Plant Care App</h2>
+            {% if overdue_plant_count == 1 %}
+                <h5 class="home-page-warning"><a href="{% url 'plant_care:warnings' %}" class="text-decoration-none text-dark">There is <b class="text-success">{{ overdue_plant_count }}</b> plant requiring your attention!</a></h5>
+            {% elif overdue_plant_count > 1 %}<h5 class="home-page-warning"><a href="{% url 'plant_care:warnings' %}" class="text-decoration-none text-dark">There are <b class="text-success">{{ overdue_plant_count }}</b> plants requiring your attention!</a></h5>
             {% else %}
                 <p>Track your plants, plan tasks, and check care history</p>
             {% endif %}
@@ -27,7 +29,7 @@
                     <div class="circle-wrapper">
                         <img src="{% static 'img/plants.png' %}" alt="My Plants">
                     </div>
-                    <h2>Plants</h2>
+                    <h2 class="home-page">Plants</h2>
                     <p>View and manage your plant collection</p>
                 </a>
             </div>
@@ -38,7 +40,7 @@
                     <div class="circle-wrapper">
                         <img src="{% static 'img/tasks.png' %}" alt="Plant tasks">
                     </div>
-                    <h2>Tasks</h2>
+                    <h2 class="home-page">Tasks</h2>
                     <p>Keep track of watering, fertilizing, and repotting schedules</p>
                 </a>
             </div>
@@ -49,7 +51,7 @@
                     <div class="circle-wrapper">
                         <img src="{% static 'img/history.png' %}" alt="Care history">
                     </div>
-                    <h2>History</h2>
+                    <h2 class="home-page">History</h2>
                     <p>Check past actions and logs</p>
                 </a>
             </div>

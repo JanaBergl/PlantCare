@@ -1,7 +1,9 @@
 from django import forms
-from datetime import date
+from datetime import date, datetime
+
+from django.core.exceptions import ValidationError
 from plant_care.constants import CAUSE_OF_DEATH_CHOICES, TASK_CATEGORY_CHOICES, TASK_FREQUENCIES
-from plant_care.models import Plant, PlantGroup, PlantTaskFrequency, PlantCareHistory
+from plant_care.models import Plant, PlantGroup, PlantTaskFrequency, PlantCareHistory, validate_plant_unique_name
 
 
 class PlantModelForm(forms.ModelForm):
@@ -106,6 +108,7 @@ class BasePlantAndTaskGenericForm(forms.Form):
         label="Name",
         max_length=50,
         widget=forms.TextInput(attrs={"class": "form-control"}),
+        validators=[validate_plant_unique_name]
     )
     group = forms.ModelChoiceField(
         label="Group",
@@ -159,6 +162,7 @@ class PlantAndTaskGenericUpdateForm(BasePlantAndTaskGenericForm):
 class PlantTaskGenericForm(forms.Form):
     """
     Generic form for performing plant care tasks - creating PlantCareHistory records for selected plants.
+    Includes task type selection, plant selection, and optional task date and time.
     """
     task_type = forms.MultipleChoiceField(
         choices=[(key, key) for key, value in TASK_CATEGORY_CHOICES],  # jinak z choice bere vzdy display
@@ -170,10 +174,27 @@ class PlantTaskGenericForm(forms.Form):
         widget=forms.CheckboxSelectMultiple,
     )
 
+    task_date = forms.DateTimeField(
+        label="Task date and time",
+        required=False,
+        widget=forms.DateTimeInput(attrs={"type": "datetime-local", "class": "form-control"}),
+        initial=datetime.now()
+    )
+
+    def clean_task_date(self) -> datetime:
+        """
+        Validates that the task date is not in the future.
+        """
+        task_date = self.cleaned_data.get('task_date')
+        if task_date > datetime.now():
+            raise forms.ValidationError("Task date cannot be in the future.")
+
+        return task_date
+
 
 class PlantCareHistoryModelForm(forms.ModelForm):
     """
-
+    pro testovaci data, jinak odstranit, moznost upravy zaznamu historie neni nutna
     """
 
     class Meta:
