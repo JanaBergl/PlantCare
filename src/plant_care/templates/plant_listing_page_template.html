@@ -11,16 +11,14 @@
                 <br>
                 <div class="d-flex justify-content-center w-75 mb-4">
                     {% if group %}
-                        <p class="view-header fs-3 m-0">🪴 Plants in '{{ group.group_name }}' 🪴</p>
+                        <a class="view-header fs-3 m-0 text-decoration-none" href="{% url 'plant_care:plants-in-group-list' group.pk %}">🪴 Plants in '{{ group.group_name }}' 🪴</a>
                     {% else %}
-                        <p class="view-header fs-3 m-0">🪴 Plant Collection 🪴</p>
+                        <a class="view-header fs-3 m-0 text-decoration-none" href="{% url 'plant_care:plant-list' %}">🪴 Plant Collection 🪴</a>
                     {% endif %}
                 </div>
 
                 <div class="d-flex justify-content-end w-75">
-                    <form method="get" class="d-flex" style="width: auto;" action="
-                        {% if request.GET.filter %}{% url 'plant_care:plant-list-search' request.GET.filter %}
-                        {% else %}{% url 'plant_care:plant-list' %}{% endif %}">
+                    <form method="get" class="d-flex" style="width: auto;" action="{% url 'plant_care:plant-list' %}">
                         <input type="text" name="filter" placeholder="Search plant or group"
                                value="{{ request.GET.filter }}" class="text-center form-control">
                         <button type="submit" class="btn ms-2 btn-animace">🔎</button>
@@ -36,9 +34,9 @@
                    style="width: 75%">
                 <thead class="table-success">
                 <tr>
-                    <th style="width: 25%"><a class="text-decoration-none text-dark" href="?sort={% if request.GET.sort == "name" %}-name{% else %}name{% endif %}">Name</a></th>
-                    <th style="width: 25%"><a class="text-decoration-none text-dark" href="?sort={% if request.GET.sort == "group__group_name" %}-group__group_name{% else %}group__group_name{% endif %}">Group</a></th>
-                    <th style="width: 25%"><a class="text-decoration-none text-dark" href="?sort={% if request.GET.sort == "date" %}-date{% else %}date{% endif %}">Purchase Date</a></th>
+                    <th style="width: 25%"><a class="text-decoration-none text-dark" href="?sort={% if request.GET.sort == "name" %}-name{% else %}name{% endif %}&filter={{ request.GET.filter|default:'' }}">Name</a></th>
+                    <th style="width: 25%"><a class="text-decoration-none text-dark" href="?sort={% if request.GET.sort == "group__group_name" %}-group__group_name{% else %}group__group_name{% endif %}&filter={{ request.GET.filter|default:'' }}">Group</a></th>
+                    <th style="width: 25%"><a class="text-decoration-none text-dark" href="?sort={% if request.GET.sort == "date" %}-date{% else %}date{% endif %}&filter={{ request.GET.filter|default:'' }}">Purchase Date</a></th>
                     <th class="text-center">Detail</th>
                     <th class="text-center">Update</th>
                     <th class="text-center">Delete</th>

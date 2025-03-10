@@ -1,7 +1,7 @@
-from django.core.exceptions import ValidationError
 from django.urls import reverse_lazy
 import datetime
 from django.db import models
+from django.utils import timezone
 from plant_care.constants import TASK_CATEGORY_CHOICES, TASK_FREQUENCIES, CAUSE_OF_DEATH_CHOICES
 
 
@@ -41,19 +41,11 @@ class PlantGroup(models.Model):
         return reverse_lazy("plant_care:plant-group-detail", kwargs={"pk": self.id})
 
 
-def validate_plant_unique_name(value):
-    """
-    Validates that a plant name is unique amongst living plants (is_alive=True)
-    """
-    if Plant.objects.filter(is_alive=True, name=value).first():
-        raise ValidationError("Plant with this name already exists.")
-
-
 class Plant(models.Model):
     """
     Represents a plant, with attributes: name, group, date of purchase, notes, and its current status (alive or not).
     """
-    name = models.CharField(max_length=100, validators=[validate_plant_unique_name])
+    name = models.CharField(max_length=100)
     group = models.ForeignKey(PlantGroup, on_delete=models.SET_NULL, null=True, blank=True, related_name="plants")
     date = models.DateField(default=datetime.date.today)
     notes = models.TextField(null=True, blank=True)
@@ -101,7 +93,7 @@ class PlantCareHistory(models.Model):
 
     plant = models.ForeignKey(Plant, on_delete=models.CASCADE)
     task_type = models.CharField(max_length=25, choices=TASK_CATEGORY_CHOICES)
-    task_date = models.DateTimeField(default=datetime.datetime.now)
+    task_date = models.DateTimeField(default=timezone.now)
 
     def __str__(self) -> str:
         return f"{self.plant.name} has been {self.get_task_type_display()} on {self.task_date.strftime('%d-%m-%Y %H:%M')}"

@@ -1,10 +1,11 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import QuerySet, Count, Q
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import redirect, get_object_or_404
+from django.utils import timezone
 from django.views.generic import ListView, TemplateView, DetailView, CreateView, UpdateView, DeleteView, FormView
 from django.urls import reverse_lazy
 from plant_care.constants import TASK_CATEGORY_CHOICES, TASK_FREQUENCIES
@@ -25,7 +26,7 @@ class HomePageTemplateView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs) -> dict:
         """
         Overrides parent method get_context_data, adds 'user_name' to context.
-        Adds 'overdue_plant_count' to context.
+        Adds 'overdue_plant_count' to context to show how many plants need care on the home page.
         """
         context = super().get_context_data(**kwargs)
         context["user_name"] = self.request.user.username
@@ -44,7 +45,7 @@ class HomePageTemplateView(LoginRequiredMixin, TemplateView):
 # LIST VIEWS____________________________________________________________________________________________________________
 class PlantListingView(LoginRequiredMixin, ListView):
     """
-    View for displaying the list of alive plants.
+    View for displaying the list of living plants.
     """
     model = Plant
     context_object_name = "plants"
@@ -52,7 +53,7 @@ class PlantListingView(LoginRequiredMixin, ListView):
 
     def get_queryset(self) -> QuerySet:
         """
-        Overrides parent method get_queryset, filters only alive plants.
+        Overrides parent method get_queryset, filters only living plants.
         Allows user to filter by name or group and sort list by plant name, group name or date of purchase in ascending or descending order.
         """
         queryset = super().get_queryset().filter(is_alive=True)
@@ -105,7 +106,7 @@ class PlantGroupListingView(LoginRequiredMixin, ListView):
 
 class PlantsInGroupListingView(LoginRequiredMixin, ListView):
     """
-    View for displaying the list of plants in a specific group.
+    View for displaying a list of plants in a specific group.
     """
     model = Plant
     context_object_name = "plants"
@@ -170,10 +171,10 @@ class PlantCareHistoryListingView(LoginRequiredMixin, ListView):
     template_name = "plant_care_history_listing_page_template.html"
     context_object_name = "history"
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         """
         Overrides parent method 'get_queryset', adds initial data for the plant care history logs ordered by date.
-        Allows user to filter by plant or group name or by task type.
+        Allows user to search by plant/group name/task type and filter history logs for the last day/week/month.
         """
         queryset = PlantCareHistory.objects.select_related('plant').order_by("-task_date")
 
@@ -187,6 +188,18 @@ class PlantCareHistoryListingView(LoginRequiredMixin, ListView):
                 Q(plant__group__group_name__istartswith=search) |
                 Q(plant__name__istartswith=search)
             ).distinct()
+
+
+        # __gte = Django ORM greater than
+        time = self.request.GET.get("time")
+        if time:
+            now = timezone.now()
+            if time == "day":
+                queryset = queryset.filter(task_date__gte=now - timedelta(days=1))
+            elif time == "week":
+                queryset = queryset.filter(task_date__gte=now - timedelta(weeks=1))
+            elif time == "month":
+                queryset = queryset.filter(task_date__gte=now - timedelta(days=30))
 
         return queryset
 
@@ -273,7 +286,7 @@ class PlantAndTaskFrequencyCreateGenericFormView(LoginRequiredMixin, FormView):
         After validation creates a new plant object and its related task frequencies objects.
         """
         plant = Plant.objects.create(
-            name=form.cleaned_data["name"].capitalize(),
+            name=form.cleaned_data["name"],
             group=form.cleaned_data["group"],
             date=form.cleaned_data["date"],
             notes=form.cleaned_data["notes"],
@@ -358,7 +371,7 @@ class PlantAndTaskFrequencyUpdateGenericFormView(LoginRequiredMixin, FormView):
 
         plant = form.plant  # TADY POTREBUJU PLANT OBJEKT, MUSIM HO ZISKAT Z FORM. PRES GET INITAL VZDY CHYBA
 
-        plant.name = form.cleaned_data["name"].capitalize()
+        plant.name = form.cleaned_data["name"]
         plant.group = form.cleaned_data["group"]
         plant.date = form.cleaned_data["date"]
         plant.notes = form.cleaned_data["notes"]
@@ -462,6 +475,28 @@ class NEFUNGUJEPlantAndTaskFrequencyUpdateGenericFormView(LoginRequiredMixin, Fo
         Returns the URL to the detail view of the newly updated plant.
         """
         return self.plant.get_absolute_url()
+
+
+class PlantCareHistoryUpdateView(LoginRequiredMixin, UpdateView):
+    """
+    View for updating a plant care history record.
+    """
+    template_name = "plant_history_log_update_page_template.html"
+    model = PlantCareHistory
+    success_url = reverse_lazy("plant_care:care-history")
+    form_class = PlantCareHistoryModelForm
+
+    def form_valid(self, form):
+        """
+        Makes sure that task_date is timezone-aware before saving.
+        """
+        task_date = form.cleaned_data.get("task_date")
+        if task_date and timezone.is_naive(task_date):
+            task_date = timezone.make_aware(task_date)
+
+        form.instance.task_date = task_date
+
+        return super().form_valid(form)
 
 
 # DELETE VIEWS__________________________________________________________________________________________________________
@@ -581,7 +616,7 @@ class PerformTaskView(LoginRequiredMixin, FormView):
         """
         task_types = form.cleaned_data.get("task_type")
         plant_list = form.cleaned_data.get("plants")
-        task_date = form.cleaned_data.get("task_date", datetime.now())
+        task_date = form.cleaned_data.get("task_date", timezone.now())
 
         for plant in plant_list:
             for task_type in task_types:
@@ -635,21 +670,5 @@ class Error404PageTemplateView(TemplateView):
     template_name = "404.html"
 
 
-class PlantCareHistoryUpdateView(LoginRequiredMixin, UpdateView):
-    """
-    View for updating a plant care history log. - PRO TESTING, ODSTRANIT ?
-    """
-    template_name = "plant_history_log_update_page_template.html"
-    model = PlantCareHistory
-    success_url = reverse_lazy("plant_care:care-history")
-    form_class = PlantCareHistoryModelForm
 
-    def get_form_kwargs(self):
-        """
-        """
-        kwargs = super().get_form_kwargs()
-        plant_care_history = self.get_object()
 
-        plant = plant_care_history.plant
-        kwargs['plant'] = plant
-        return kwargs

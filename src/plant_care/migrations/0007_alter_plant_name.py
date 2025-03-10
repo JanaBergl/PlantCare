@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='plant',
             name='name',
-            field=models.CharField(max_length=100, validators=[plant_care.models.validate_plant_unique_name]),
+            field=models.CharField(max_length=100),
         ),
     ]

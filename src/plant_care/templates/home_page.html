@@ -9,11 +9,16 @@
 {% block banner %}
     <section id="banner">
         <header>
-            <h2 class="home-page-welcome">Hello, {% if user_name %}<em class="text-success">{{ user_name }}</em>!{% else %}user!{% endif %}
-                Welcome to Plant Care App</h2>
+            <h2 class="home-page-welcome">Hello, {% if user_name %}<em class="text-success">{{ user_name }}</em>
+            !{% else %}user!{% endif %}
+            Welcome to Plant Care App!</h2>
             {% if overdue_plant_count == 1 %}
-                <h5 class="home-page-warning"><a href="{% url 'plant_care:warnings' %}" class="text-decoration-none text-dark">There is <b class="text-success">{{ overdue_plant_count }}</b> plant requiring your attention!</a></h5>
-            {% elif overdue_plant_count > 1 %}<h5 class="home-page-warning"><a href="{% url 'plant_care:warnings' %}" class="text-decoration-none text-dark">There are <b class="text-success">{{ overdue_plant_count }}</b> plants requiring your attention!</a></h5>
+                <h5 class="home-page-warning"><a href="{% url 'plant_care:warnings' %}"
+                                                 class="text-decoration-none text-dark">There is <b
+                        class="text-success">{{ overdue_plant_count }}</b> plant requiring your attention!</a></h5>
+            {% elif overdue_plant_count > 1 %}<h5 class="home-page-warning"><a href="{% url 'plant_care:warnings' %}"
+                                                                               class="text-decoration-none text-dark">There
+                are <b class="text-success">{{ overdue_plant_count }}</b> plants requiring your attention!</a></h5>
             {% else %}
                 <p>Track your plants, plan tasks, and check care history</p>
             {% endif %}

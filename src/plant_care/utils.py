@@ -1,6 +1,4 @@
 import datetime
-
-from django.core.exceptions import ValidationError
 from plant_care.constants import TASK_CATEGORY_CHOICES
 from plant_care.models import PlantCareHistory, Plant
 

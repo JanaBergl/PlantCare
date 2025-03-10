@@ -3,41 +3,12 @@ from datetime import date, datetime
 
 from django.core.exceptions import ValidationError
 from plant_care.constants import CAUSE_OF_DEATH_CHOICES, TASK_CATEGORY_CHOICES, TASK_FREQUENCIES
-from plant_care.models import Plant, PlantGroup, PlantTaskFrequency, PlantCareHistory, validate_plant_unique_name
-
-
-class PlantModelForm(forms.ModelForm):
-    """
-    Form to create and update Plant objects.
-    """
-
-    class Meta:
-        model = Plant
-        fields = [
-            'name',
-            'group',
-            'date',
-            'notes',
-        ]
-
-        labels = {
-            'name': 'Name',
-            'group': 'Group',
-            'date': 'Date of purchase',
-            'notes': 'Notes',
-        }
-
-        widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control'}),
-            'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-            'notes': forms.Textarea(attrs={'class': 'form-control'}),
-            'group': forms.Select(attrs={'class': 'form-control'}),
-        }
+from plant_care.models import Plant, PlantGroup, PlantCareHistory
 
 
 class PlantGroupModelForm(forms.ModelForm):
     """
-    Form to update and create PlantGroup objects
+    Form to update and create PlantGroup objects.
     """
 
     class Meta:
@@ -60,46 +31,6 @@ class CauseOfDeathForm(forms.Form):
     cause_of_death = forms.ChoiceField(choices=CAUSE_OF_DEATH_CHOICES, required=True)
 
 
-class PlantTaskFrequencyGenericForm(forms.Form):
-    """"""
-
-    def __init__(self, *args, **kwargs) -> None:
-        """
-        Generates the form fields according to TASK_CATEGORY_CHOICES. Fills the field with exiting data if there is available.
-        """
-        super().__init__(*args, **kwargs)
-        for task, task_display in TASK_CATEGORY_CHOICES:
-            initial_frequency = TASK_FREQUENCIES.get(task, None)
-
-            self.fields[task] = forms.IntegerField(
-                required=False,
-                initial=initial_frequency,
-                label=f"{task} frequency (in days)",
-                widget=forms.NumberInput(
-                    attrs={'class': 'form-control', 'placeholder': 'Optional' if initial_frequency is None else None})
-            )
-
-    def save(self, plant) -> None:
-        """
-        Saves the task frequency data for a given plant. If a frequency is not provided, default one from TASK_FREQUENCIES is saved.
-        If a valid frequency is found, a PlantTaskFrequency object is created and saved for the given plant.
-
-        :param plant: The Plant instance to associate the task frequencies with.
-        """
-        # "Watering", "watered"
-        for task, task_display in TASK_CATEGORY_CHOICES:
-            frequency = self.cleaned_data.get(task)
-            if frequency is None:
-                frequency = TASK_FREQUENCIES.get(task, None)
-
-            if frequency is not None:
-                PlantTaskFrequency.objects.create(
-                    plant=plant,
-                    task_type=task,
-                    frequency=frequency
-                )
-
-
 class BasePlantAndTaskGenericForm(forms.Form):
     """
     Base form for creating and updating Plant and PlantTaskFrequency objects at the same time.
@@ -108,7 +39,6 @@ class BasePlantAndTaskGenericForm(forms.Form):
         label="Name",
         max_length=50,
         widget=forms.TextInput(attrs={"class": "form-control"}),
-        validators=[validate_plant_unique_name]
     )
     group = forms.ModelChoiceField(
         label="Group",
@@ -127,9 +57,9 @@ class BasePlantAndTaskGenericForm(forms.Form):
         required=False,
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         """
-        Dynamically creates fields for user to fill out based on every task_type in TASK_CATEGORY_CHOICES.
+        Dynamically creates fields for user to fill out based on task types in TASK_CATEGORY_CHOICES.
         """
         super().__init__(*args, **kwargs)
 
@@ -141,6 +71,15 @@ class BasePlantAndTaskGenericForm(forms.Form):
                                                 "placeholder": "Optional" if TASK_FREQUENCIES.get(
                                                     task) is None else ""}),
             )
+
+    def clean_name(self):
+        """
+
+        """
+        name = self.cleaned_data.get('name')
+        if Plant.objects.filter(is_alive=True, name__iexact=name).exists():
+            raise ValidationError("Plant with this name already exists.")
+        return name
 
 
 class PlantAndTaskGenericUpdateForm(BasePlantAndTaskGenericForm):
@@ -155,8 +94,24 @@ class PlantAndTaskGenericUpdateForm(BasePlantAndTaskGenericForm):
     # -> jedine co zatim funguje je toto s .pop
 
     def __init__(self, *args, **kwargs) -> None:
+        """
+
+        """
         self.plant = kwargs.pop('plant', None)
         super().__init__(*args, **kwargs)
+
+    def clean_name(self):
+        """
+        Custom validation for name field when updating a plant.
+        Allows the name to remain the same, but prevents duplicates when changed.
+        """
+        name = self.cleaned_data.get('name')
+
+        if self.plant and self.plant.name != name:
+            if Plant.objects.filter(is_alive=True, name=name).exists():
+                raise ValidationError("Plant with this name already exists.")
+
+        return name
 
 
 class PlantTaskGenericForm(forms.Form):
@@ -178,12 +133,12 @@ class PlantTaskGenericForm(forms.Form):
         label="Task date and time",
         required=False,
         widget=forms.DateTimeInput(attrs={"type": "datetime-local", "class": "form-control"}),
-        initial=datetime.now()
+        initial=datetime.now().replace(second=0)
     )
 
     def clean_task_date(self) -> datetime:
         """
-        Validates that the task date is not in the future.
+        Validates that the task date is not in the future. Raises ValidationError if it is.
         """
         task_date = self.cleaned_data.get('task_date')
         if task_date > datetime.now():
@@ -194,7 +149,7 @@ class PlantTaskGenericForm(forms.Form):
 
 class PlantCareHistoryModelForm(forms.ModelForm):
     """
-    pro testovaci data, jinak odstranit, moznost upravy zaznamu historie neni nutna
+    ModelForm for updating PlantCareHistory records.
     """
 
     class Meta:
@@ -212,16 +167,6 @@ class PlantCareHistoryModelForm(forms.ModelForm):
 
         widgets = {
             "task_type": forms.Select(attrs={"class": "form-control"}),
-            "task_date": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
+            "task_date": forms.DateTimeInput(attrs={"type": "datetime-local", "class": "form-control"}),
 
         }
-
-    def __init__(self, *args, **kwargs):
-        """
-
-        """
-        plant = kwargs.pop('plant', None)
-        super().__init__(*args, **kwargs)
-
-        if plant:
-            self.instance.plant = plant

@@ -10,40 +10,64 @@
             <div class="d-flex flex-column align-items-center">
                 <br>
                 <div class="d-flex justify-content-center w-75 mb-4">
-                    <p class="view-header fs-3 m-0 text-center">🌱 Care History 🌱</p>
+                    <a class="view-header fs-3 m-0 text-center text-decoration-none" href="{% url 'plant_care:care-history' %}">🌱 Care history 🌱</a>
                 </div>
 
-                <div class="d-flex justify-content-end w-75 mb-4">
+                <div class="d-flex justify-content-between w-75 mb-4 mt-2">
+                    <div class="d-flex w-50">
+                        <a href="{% url 'plant_care:care-history' %}?filter={{ request.GET.filter }}"
+                           class="btn btn-animace btn-success flex-grow-1 ms-2">All</a>
+                        <a href="{% url 'plant_care:care-history' %}?filter={{ request.GET.filter }}&time=day"
+                           class="btn btn-animace btn-success flex-grow-1 ms-2">Today</a>
+                        <a href="{% url 'plant_care:care-history' %}?filter={{ request.GET.filter }}&time=week"
+                           class="btn btn-animace btn-success flex-grow-1 ms-2">Last Week</a>
+                        <a href="{% url 'plant_care:care-history' %}?filter={{ request.GET.filter }}&time=month"
+                           class="btn btn-animace btn-success flex-grow-1 ms-2">Last Month</a>
+                    </div>
                     <form method="get" action="{% url 'plant_care:care-history' %}"
                           class="d-flex" style="width: auto;">
                         <input type="text" name="filter" placeholder="Search task/plant/group"
                                value="{{ request.GET.filter }}" class="text-center form-control">
                         <button type="submit" class="btn ms-2 btn-animace">🔎</button>
                     </form>
+
                 </div>
-
             </div>
 
-            <div class="d-flex justify-content-center align-items-center mb-4">
-                <table class="table table-striped table-bordered table-sm table-hover"
-                       style="table-layout: auto; max-width: 75%; word-wrap: break-word;">
-                    <tbody>
-                    {% for log in history %}
-                        <tr>
-                            <td class="text-center">
-                                "<a class="text-decoration-none text-dark" href="{{ log.plant.get_absolute_url }}">{{ log.plant.name }}"</a>
-                                <a class="text-decoration-none text-dark" href="{{ log.plant.group.get_absolute_url }}">("{{ log.plant.group }}")</a> was
-                                <b>{{ log.get_task_type_display }}</b> on {{ log.formatted_task_date }}.
-                            </td>
-                            <td class="text-center">
-                                <a class="text-decoration-none"
-                                   href="{% url 'plant_care:care-history-delete' log.pk %}">🗑️</a>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+        </div>
+
+        <div class="d-flex justify-content-center align-items-center mb-4">
+            <table class="table table-striped table-bordered table-sm table-hover"
+                   style="table-layout: auto; max-width: 75%; word-wrap: break-word;">
+                <thead class="table-success">
+                <tr>
+                    <th class="text-center">Log</th>
+                    <th class="text-center">Update</th>
+                    <th class="text-center">Delete</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for log in history %}
+                    <tr>
+                        <td class="text-center">
+                            <a class="text-decoration-none text-dark"
+                               href="{{ log.plant.get_absolute_url }}">"{{ log.plant.name }}"</a>
+                            <a class="text-decoration-none text-dark"
+                               href="{{ log.plant.group.get_absolute_url }}">("{{ log.plant.group }}")</a> was
+                            <b>{{ log.get_task_type_display }}</b> on {{ log.formatted_task_date }}.
+                        </td>
+                        <td class="text-center">
+                            <a class="text-decoration-none"
+                               href="{% url 'plant_care:care-history-update' log.pk %}">✏️</a>
+                        </td>
+                        <td class="text-center">
+                            <a class="text-decoration-none"
+                               href="{% url 'plant_care:care-history-delete' log.pk %}">🗑️</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         </div>
     {% else %}
         <p class="text-center mt-5">There is no care history.</p>

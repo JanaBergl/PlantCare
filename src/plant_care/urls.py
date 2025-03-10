@@ -12,12 +12,12 @@ urlpatterns = [
     # HOME PAGE
     path('', HomePageTemplateView.as_view(), name='home-page-app'),
 
-    # LISTING VIEWS
+    # LIST VIEWS
     path('list/', PlantListingView.as_view(), name='plant-list'),
-    path('list/<str:filter>/', PlantListingView.as_view(), name='plant-list-search'),
     path('group-list/', PlantGroupListingView.as_view(), name='plant-group-list'),
     path('plants-in-group-list/<int:pk>', PlantsInGroupListingView.as_view(), name='plants-in-group-list'),
     path('care-history/', PlantCareHistoryListingView.as_view(), name='care-history'),
+    path('graveyard-list/', PlantGraveyardListingView.as_view(), name='plant-graveyard-list'),
 
     # DETAIL VIEWS
     path('plant-detail/<int:pk>/', PlantDetailView.as_view(), name='plant-detail'),
@@ -39,7 +39,6 @@ urlpatterns = [
 
     # CUSTOM VIEWS
     path('dead/<int:pk>/', DeadPlantView.as_view(), name='dead-plant'),
-    path('graveyard-list/', PlantGraveyardListingView.as_view(), name='plant-graveyard-list'),
     path('perform-tasks/', PerformTaskView.as_view(), name='perform-tasks'),
     path('warnings/', PlantCareOverdueWarningsView.as_view(), name='warnings'),
 
