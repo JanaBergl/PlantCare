@@ -103,11 +103,13 @@ class PlantCareHistory(models.Model):
 
     def formatted_task_date(self) -> str:
         """
-        Formats the task date into a specific string format.
+        Formats the task date into a specific string format considering the timezone.
 
         :return: A string representing the task date formatted as "%d/%m/%Y %H:%M"
         """
-        return self.task_date.strftime("%d/%m/%Y %H:%M")
+        local_task_date = timezone.localtime(self.task_date)
+
+        return local_task_date.strftime("%d/%m/%Y %H:%M")
 
     def perform_task(self, task_type, task_date):
         """"""

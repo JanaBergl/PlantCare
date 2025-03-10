@@ -9,10 +9,7 @@
 
 {% block content %}
     <div class="container mt-5 mb-5 position-relative">
-        <a href="{% url 'plant_care:plant-group-list' %}"
-           class="position-absolute top-0 start-0 m-3 text-decoration-none text-dark fs-3">
-            🔙
-        </a>
+        {% include 'snippets/back_button.html' %}
         <div class="d-flex justify-content-center align-items-center mb-4">
 
             <table class="table table-bordered table-responsive w-50 mx-auto">

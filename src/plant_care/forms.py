@@ -2,6 +2,7 @@ from django import forms
 from datetime import date, datetime
 
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 from plant_care.constants import CAUSE_OF_DEATH_CHOICES, TASK_CATEGORY_CHOICES, TASK_FREQUENCIES
 from plant_care.models import Plant, PlantGroup, PlantCareHistory
 
@@ -136,7 +137,7 @@ class PlantTaskGenericForm(forms.Form):
         label="Task date and time",
         required=False,
         widget=forms.DateTimeInput(attrs={"type": "datetime-local", "class": "form-control"}),
-        initial=datetime.now().replace(second=0)
+        initial=timezone.localtime(timezone.now()).replace(second=0)
     )
 
     def clean_task_date(self) -> datetime:
@@ -144,7 +145,8 @@ class PlantTaskGenericForm(forms.Form):
         Validates that the task date is not in the future. Raises ValidationError if it is.
         """
         task_date = self.cleaned_data.get('task_date')
-        if task_date > datetime.now():
+
+        if task_date and task_date > timezone.localtime(timezone.now()):
             raise forms.ValidationError("Task date cannot be in the future.")
 
         return task_date

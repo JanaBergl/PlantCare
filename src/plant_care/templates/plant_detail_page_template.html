@@ -9,19 +9,7 @@
 
 {% block content %}
     <div class="container mt-5 mb-5 position-relative">
-        {% if plant.is_alive %}
-            <a href="{% url 'plant_care:plant-list' %}"
-               class="position-absolute top-0 start-0 m-3 text-decoration-none text-dark fs-3">
-                🔙
-            </a>
-        {% else %}
-            <a href="{% url 'plant_care:plant-graveyard-list' %}"
-               class="position-absolute top-0 start-0 m-3 text-decoration-none text-dark fs-3">
-                🔙
-            </a>
-
-        {% endif %}
-
+            {% include 'snippets/back_button.html' %}
         <div class="d-flex justify-content-center align-items-center mb-4">
 
             <table class="table table-bordered table-striped table-responsive w-50 mx-auto">
@@ -67,7 +55,6 @@
                         <th scope="row">History</th>
                         <td><a class="text-decoration-none" href="{% url 'plant_care:care-history'%}?filter={{ plant.name }}">🔍</a></td>
                     </tr>
-                    <!--sem pridat varovani pokud jsou -->
                     {% if plant_warnings %}
                         <tr>
                             <th scope="row">Warnings</th>

@@ -189,7 +189,6 @@ class PlantCareHistoryListingView(LoginRequiredMixin, ListView):
                 Q(plant__name__istartswith=search)
             ).distinct()
 
-
         # __gte = Django ORM greater than
         time = self.request.GET.get("time")
         if time:
@@ -607,12 +606,18 @@ class PerformTaskView(LoginRequiredMixin, FormView):
 
     def get_context_data(self, **kwargs) -> dict:
         """
-        Adds only living plants to the context.
-        Adds a list of plants with active warnings for overdue tasks.
+        Adds only living plants and a list of plants with active warnings for overdue tasks to the context.
+        Allows search by plant name or group name.
         """
         context = super().get_context_data(**kwargs)
-        context["plants"] = Plant.objects.filter(is_alive=True)
 
+        search = self.request.GET.get("filter", "")
+
+        plants_queryset = Plant.objects.filter(is_alive=True)
+        if search:
+            plants_queryset = plants_queryset.filter(Q(name__icontains=search) | Q(group__group_name__icontains=search))
+
+        context["plants"] = plants_queryset
         context["plants_in_danger"] = {warning["plant"].id for warning in show_care_warnings()}
 
         return context
@@ -625,6 +630,9 @@ class PerformTaskView(LoginRequiredMixin, FormView):
         task_types = form.cleaned_data.get("task_type")
         plant_list = form.cleaned_data.get("plants")
         task_date = form.cleaned_data.get("task_date", timezone.now())
+
+        if not timezone.is_aware(task_date):
+            task_date = timezone.make_aware(task_date, timezone.get_current_timezone())
 
         for plant in plant_list:
             for task_type in task_types:
@@ -676,7 +684,3 @@ class Error404PageTemplateView(TemplateView):
     zkouska custom 404 page not found stranky, smazat!
     """
     template_name = "404.html"
-
-
-
-
