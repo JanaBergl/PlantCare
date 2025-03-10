@@ -215,13 +215,17 @@ class PlantDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs) -> dict:
         """
-        Overrides parent method get_context_data, adds 'task_frequencies' to context.
+        Overrides parent method get_context_data, adds task_frequencies and warnings to context.
         """
         context = super().get_context_data(**kwargs)
         plant = self.get_object()
 
         task_frequencies = PlantTaskFrequency.objects.filter(plant=plant)
         context["task_frequencies"] = task_frequencies
+
+        warnings = show_care_warnings()
+        plant_warnings = [warning for warning in warnings if warning["plant"] == plant]
+        context["plant_warnings"] = plant_warnings
 
         return context
 
@@ -603,10 +607,14 @@ class PerformTaskView(LoginRequiredMixin, FormView):
 
     def get_context_data(self, **kwargs) -> dict:
         """
-        Adds living plants to the context
+        Adds only living plants to the context.
+        Adds a list of plants with active warnings for overdue tasks.
         """
         context = super().get_context_data(**kwargs)
         context["plants"] = Plant.objects.filter(is_alive=True)
+
+        context["plants_in_danger"] = {plant["plant"].id for plant in show_care_warnings()}
+
         return context
 
     def form_valid(self, form) -> HttpResponseRedirect:

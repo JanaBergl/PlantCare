@@ -67,6 +67,17 @@
                         <th scope="row">History</th>
                         <td><a class="text-decoration-none" href="{% url 'plant_care:care-history'%}?filter={{ plant.name }}">🔍</a></td>
                     </tr>
+                    <!--sem pridat varovani pokud jsou -->
+                    {% if plant_warnings %}
+                        <tr>
+                            <th scope="row">Warnings</th>
+                            <td>
+                            {% for warning in plant_warnings %}
+                                ⚠️ {{ warning.task_type }} is {{ warning.days_since_task }} days overdue!<br>
+                            {% endfor %}
+                            </td>
+                        </tr>
+                    {% endif %}
                 {% else %}
                     <tr>
                         <th scope="row">Time of death</th>

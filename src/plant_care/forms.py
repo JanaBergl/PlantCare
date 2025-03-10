@@ -74,11 +74,14 @@ class BasePlantAndTaskGenericForm(forms.Form):
 
     def clean_name(self):
         """
-
+        Custom validation for name field when creating a new plant.
+        Makes sure no duplicate plant names for living plants are created.
         """
         name = self.cleaned_data.get('name')
+
         if Plant.objects.filter(is_alive=True, name__iexact=name).exists():
             raise ValidationError("Plant with this name already exists.")
+
         return name
 
 

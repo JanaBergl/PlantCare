@@ -36,9 +36,12 @@
                                 <input type="checkbox" id="plant-{{ plant.id }}" name="plants" value="{{ plant.id }}">
                             </td>
                             <td>
-                                <label for="plant-{{ plant.id }}" class="d-flex align-items-center">
-                                    {{ plant.name }}
-                                </label>
+                            <label for="plant-{{ plant.id }}" class="d-flex align-items-center">
+                                {{ plant.name }}
+                                {% if plant.id in plants_in_danger %}
+                                    <span class="text-warning ms-2">⚠️</span> <!-- span = na stejny radek pridat-->
+                                {% endif %}
+                            </label>
                             </td>
                             <td>
                                 <a class="text-decoration-none text-dark"
