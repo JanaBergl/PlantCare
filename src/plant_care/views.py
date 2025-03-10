@@ -613,7 +613,7 @@ class PerformTaskView(LoginRequiredMixin, FormView):
         context = super().get_context_data(**kwargs)
         context["plants"] = Plant.objects.filter(is_alive=True)
 
-        context["plants_in_danger"] = {plant["plant"].id for plant in show_care_warnings()}
+        context["plants_in_danger"] = {warning["plant"].id for warning in show_care_warnings()}
 
         return context
 
