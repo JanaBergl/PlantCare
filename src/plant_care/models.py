@@ -7,8 +7,10 @@ from plant_care.constants import TASK_CATEGORY_CHOICES, TASK_FREQUENCIES, CAUSE_
 
 class PlantGroup(models.Model):
     """
-    Represents a group or a category of plants. Each group has a name and can
-    be used to organize plants into different categories.
+    Represents a group or a category of plants.
+
+    Fields:
+        - group_name (string): Unique name of the group.
     """
     group_name = models.CharField(max_length=50, unique=True)
 
@@ -20,13 +22,14 @@ class PlantGroup(models.Model):
 
     def delete(self, *args, **kwargs) -> None:
         """
-        Overrides parent 'delete' method. Ensures that default group 'Uncategorized' cannot be deleted.
-        When another group is deleted, all plants in that group are reassigned to default 'Uncategorized'
+        Makes sure that default group 'Uncategorized' cannot be deleted.
+        If another group is deleted, all plants in that group are reassigned to default 'Uncategorized'
+
+        :raises ValueError: If user tries to delete 'Uncategorized' group.
         """
         if self.group_name == "Uncategorized":
             raise ValueError("The 'Uncategorized' group cannot be deleted.")
 
-        # plants v deleted group -> group=None -> group="Uncategorized" (save metoda v Plant)
         plants_in_group = Plant.objects.filter(group=self)
         for plant in plants_in_group:
             plant.group = None
@@ -43,7 +46,14 @@ class PlantGroup(models.Model):
 
 class Plant(models.Model):
     """
-    Represents a plant, with attributes: name, group, date of purchase, notes, and its current status (alive or not).
+    Represents a plant, with fields: name, group, date of purchase, notes, and its current status (alive or not).
+
+    Fields:
+        - name (string): Name of the plant.
+        - group (PlantGroup): Optional group to which the plant belongs (ForeignKey to PlantGroup). If not provided, set to default 'Uncategorized'.
+        - date (datetime.date): Date of purchase.
+        - notes (string): Optional additional notes about the plant.
+        - is_alive (bool): Status of the plant - alive or not.
     """
     name = models.CharField(max_length=100)
     group = models.ForeignKey(PlantGroup, on_delete=models.SET_NULL, null=True, blank=True, related_name="plants")
@@ -59,7 +69,8 @@ class Plant(models.Model):
 
     def save(self, *args, **kwargs) -> None:
         """
-        Overrides parent 'self' method and sets a default group to 'Uncategorized' if not provided by user. If 'Uncategorized' group does not exist, it will be created.
+        Overrides parent 'save' method and sets a default group to 'Uncategorized' if not provided by user.
+        If 'Uncategorized' group does not exist, it will be created.
         """
         if self.group is None:
             self.group = PlantGroup.objects.get_or_create(group_name='Uncategorized')[0]
@@ -73,7 +84,7 @@ class Plant(models.Model):
 
     def move_to_graveyard(self, reason: str) -> None:
         """
-        Moves a plant to a graveyard, changes 'is_alive' parameter to False.
+        Moves a plant to a graveyard, changes its 'is_alive' field to False.
 
         :param reason: A string representing the cause of death of the plant.
         """
@@ -87,9 +98,13 @@ class Plant(models.Model):
 
 class PlantCareHistory(models.Model):
     """
-    Represents the care history of a plant, noting the type of task performed (watering, fertilizing, repotting),
-    the date the task was done, and the related plant.
-    """
+    Represents the care history of a plant, recording the type of task performed, the date when the task was done, and the related plant.
+
+    Fields:
+        - plant (Plant): The plant object related to the care history (ForeignKey to the Plant model).
+        - task_type (string): The type of task performed (based on TASK_CATEGORY_CHOICES).
+        - task_date (datetime): The date and time when the task was performed.
+        """
 
     plant = models.ForeignKey(Plant, on_delete=models.CASCADE)
     task_type = models.CharField(max_length=25, choices=TASK_CATEGORY_CHOICES)
@@ -111,33 +126,26 @@ class PlantCareHistory(models.Model):
 
         return local_task_date.strftime("%d/%m/%Y %H:%M")
 
-    def perform_task(self, task_type, task_date):
-        """"""
-        if task_type not in TASK_CATEGORY_CHOICES:
-            raise ValueError("Invalid task type.")
-
-        task_history = PlantCareHistory.objects.create(
-            plant=self.plant,
-            task_type=task_type,
-            task_date=task_date,
-        )
-
-        return task_history
-
 
 def get_default_frequency(task_type) -> int | None:
     """
     Returns the default frequency for a task from the 'TASK_FREQUENCIES' dictionary.
 
-    :return: The default frequency for a given task type or None
-    """
+    :param task_type: The type of task for which the frequency is requested.
 
+    :return: The default frequency for a given task type or None if not found.
+    """
     return TASK_FREQUENCIES.get(task_type, None)
 
 
 class PlantTaskFrequency(models.Model):
     """
     Represents the frequency at which a specific task should be performed for a particular plant.
+
+    Fields:
+        - plant (Plant): The plant associated with the task frequency (ForeignKey to the Plant model).
+        - task_type (string): The type of task (based on TASK_CATEGORY_CHOICES).
+        - frequency (int): The number of allowed days between each task. If not set, default frequency is used from TASK_FREQUENCIES.
     """
 
     plant = models.ForeignKey(Plant, on_delete=models.CASCADE, related_name="task_frequencies")
@@ -161,7 +169,12 @@ class PlantTaskFrequency(models.Model):
 
 class PlantGraveyard(models.Model):
     """
-    Represents the 'graveyard' where dead plants are moved. Stores the plant associated with the graveyard entry, the date of death, and cause of death.
+    Represents the 'graveyard' where dead plants are moved.
+
+    Fields:
+        - plant (Plant): The plant associated with the graveyard entry (OneToOneField to the Plant model).
+        - date_of_death (datetime): The date of the plants' death.
+        - cause_of_death (string): Optional cause of death for the plant, chosen from CAUSE_OF_DEATH_CHOICES. If not provided, default "unknown" is used.
     """
 
     plant = models.OneToOneField(Plant, on_delete=models.CASCADE)

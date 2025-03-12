@@ -31,8 +31,8 @@
                         <th class="text-center" style="width: 5%">
                             <input type="checkbox" id="select_all"/>
                         </th>
-                        <th style="width: 40%">Name</th>
-                        <th style="width: 40%">Group</th>
+                        <th style="width: 40%"><a class="text-decoration-none text-dark" href="?sort={% if request.GET.sort == "name" %}-name{% else %}name{% endif %}&filter={{ request.GET.filter|default:'' }}">Name</a></th>
+                        <th style="width: 40%"><a class="text-decoration-none text-dark" href="?sort={% if request.GET.sort == "group" %}-group{% else %}group{% endif %}&filter={{ request.GET.filter|default:'' }}">Group</a></th>
                         <th class="text-center">Detail</th>
                     </tr>
                     </thead>

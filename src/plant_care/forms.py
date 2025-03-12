@@ -1,6 +1,5 @@
 from django import forms
 from datetime import date, datetime
-
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from plant_care.constants import CAUSE_OF_DEATH_CHOICES, TASK_CATEGORY_CHOICES, TASK_FREQUENCIES
@@ -27,7 +26,7 @@ class PlantGroupModelForm(forms.ModelForm):
 
 class CauseOfDeathForm(forms.Form):
     """
-    Form to allow user to choose the cause of death for a plant.
+    Form to allow user to choose the cause of death for a plant when marking it as dead.
     """
     cause_of_death = forms.ChoiceField(choices=CAUSE_OF_DEATH_CHOICES, required=True)
 
@@ -60,7 +59,7 @@ class BasePlantAndTaskGenericForm(forms.Form):
 
     def __init__(self, *args, **kwargs) -> None:
         """
-        Dynamically creates fields for user to fill out based on task types in TASK_CATEGORY_CHOICES.
+        Dynamically generates frequency fields for each task type in TASK_CATEGORY_CHOICES.
         """
         super().__init__(*args, **kwargs)
 
@@ -88,8 +87,10 @@ class BasePlantAndTaskGenericForm(forms.Form):
 
 class PlantAndTaskGenericUpdateForm(BasePlantAndTaskGenericForm):
     """
-    Form based on parent 'BasePlantAndTaskForm' to update Plant and PlantTaskFrequency objects at the same time.
+    Form based on parent BasePlantAndTaskForm to update Plant and PlantTaskFrequency objects at the same time.
+
     https://forum.djangoproject.com/t/using-request-user-in-forms-py/19184/4 - pop z init?
+    https://sayari3.com/articles/16-how-to-pass-user-object-to-django-form/
     """
 
     # BEZ POP A PRI POUZIVANI GET_INITIAL V UPDATE VZDY CHYBA TypeError at /plants/update-plant/22/
@@ -99,7 +100,7 @@ class PlantAndTaskGenericUpdateForm(BasePlantAndTaskGenericForm):
 
     def __init__(self, *args, **kwargs) -> None:
         """
-
+        Initializes the form, saves a given 'plant' argument and removes it to prevent TypeError.
         """
         self.plant = kwargs.pop('plant', None)
         super().__init__(*args, **kwargs)
@@ -120,11 +121,11 @@ class PlantAndTaskGenericUpdateForm(BasePlantAndTaskGenericForm):
 
 class PlantTaskGenericForm(forms.Form):
     """
-    Generic form for performing plant care tasks - creating PlantCareHistory records for selected plants.
+    Form for performing plant care tasks - creating PlantCareHistory records for selected plants.
     Includes task type selection, plant selection, and optional task date and time.
     """
     task_type = forms.MultipleChoiceField(
-        choices=[(key, key) for key, value in TASK_CATEGORY_CHOICES],  # jinak z choice bere vzdy display
+        choices=[(key, key) for key, value in TASK_CATEGORY_CHOICES],
         widget=forms.CheckboxSelectMultiple(attrs={"class": "form-check-input"}),
     )
 

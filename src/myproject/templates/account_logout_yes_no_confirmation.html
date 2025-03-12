@@ -10,8 +10,8 @@
             <h3 class="text-center text-success mb-4">Are you sure you want to log out, {{ user.username }}?</h3>
             <br>
             <div class="d-flex">
-                <a href="{% url 'plant_care:home-page-app' %}"><button class="btn btn-success" style="margin-right: 20px;">Stay</button></a>
-                <a href="{% url 'logout' %}?userid={{ user.pk }}"><button class="btn btn-danger">Logout</button></a>
+                <a href="{% url 'plant_care:home-page-app' %}" style="margin-right: 10px;"><button class="btn btn-animace text-light">Stay</button></a>
+                <a href="{% url 'logout' %}?userid={{ user.pk }}"><button class="btn btn-animace-danger text-light">Logout</button></a>
             </div>
         </div>
     </div>

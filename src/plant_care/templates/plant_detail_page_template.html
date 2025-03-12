@@ -9,7 +9,7 @@
 
 {% block content %}
     <div class="container mt-5 mb-5 position-relative">
-            {% include 'snippets/back_button.html' %}
+        {% include 'snippets/back_button.html' %}
         <div class="d-flex justify-content-center align-items-center mb-4">
 
             <table class="table table-bordered table-striped table-responsive w-50 mx-auto">
@@ -29,12 +29,14 @@
                     <th scope="row">Date of purchase</th>
                     <td>{{ plant.date|date:"d. m. Y" }}</td>
                 </tr>
-                {% if plant.notes %}
-                    <tr>
-                        <th scope="row">Notes</th>
+                <tr>
+                    <th scope="row">Notes</th>
+                    {% if plant.notes %}
                         <td>{{ plant.notes }}</td>
-                    </tr>
-                {% endif %}
+                    {% else %}
+                        <td>No notes added</td>
+                        </tr>
+                    {% endif %}
                 {% if plant.is_alive %}
                     {% if task_frequencies %}
                         {% for task in task_frequencies %}
@@ -53,15 +55,16 @@
                     {% endif %}
                     <tr>
                         <th scope="row">History</th>
-                        <td><a class="text-decoration-none" href="{% url 'plant_care:care-history'%}?filter={{ plant.name }}">🔍</a></td>
+                        <td><a class="text-decoration-none"
+                               href="{% url 'plant_care:care-history' %}?filter={{ plant.name }}">🔍</a></td>
                     </tr>
                     {% if plant_warnings %}
                         <tr>
                             <th scope="row">Warnings</th>
                             <td>
-                            {% for warning in plant_warnings %}
-                                ⚠️ {{ warning.task_type }} is {{ warning.days_since_task }} days overdue!<br>
-                            {% endfor %}
+                                {% for warning in plant_warnings %}
+                                    ⚠️ {{ warning.task_type }} is {{ warning.days_since_task }} days overdue!<br>
+                                {% endfor %}
                             </td>
                         </tr>
                     {% endif %}
@@ -80,6 +83,7 @@
             </table>
         </div>
         <div class="d-flex justify-content-center mt-4">
+            <a href="{% url 'plant_care:perform-tasks' %}?filter={{ plant.name }}" class="btn">🫗 Care</a>
             <a href="{% url 'plant_care:plant-update' plant.pk %}" class="btn me-2">✏️ Update</a>
             <a href="{% url 'plant_care:plant-delete' plant.pk %}" class="btn me-2">🗑️ Delete</a>
             <a href="{% url 'plant_care:dead-plant' plant.pk %}" class="btn">🪦 RIP</a>

@@ -9,9 +9,7 @@
 {% block banner %}
     <section id="banner">
         <header>
-            <h2 class="home-page-welcome">Hello, {% if user_name %}<em class="text-success">{{ user_name }}</em>
-            !{% else %}user!{% endif %}
-            Welcome to Plant Care App!</h2>
+            <h2 class="home-page-welcome">Hello, {% if user_name %}<em class="text-success">{{ user_name }}</em> !{% else %}user!{% endif %} Welcome to Plant Care App!</h2>
             {% if overdue_plant_count == 1 %}
                 <h5 class="home-page-warning"><a href="{% url 'plant_care:warnings' %}"
                                                  class="text-decoration-none text-dark">There is <b
@@ -32,7 +30,13 @@
             <div class="box highlight">
                 <a href="{% url 'plant_care:plant-list' %}" class="text-decoration-none text-dark">
                     <div class="circle-wrapper">
-                        <img src="{% static 'img/plants.png' %}" alt="My Plants">
+                        <img src="{% static 'img/plants.png' %}" alt="My Plants" class="circle-image">
+                        {% if number_of_plants %}
+                            <div class="circle-text"><em>{{ number_of_plants }} plants in your collection</em></div>
+                        {% else %}
+                            <div class="circle-text"><em>There are no plants in your collection yet</em></div>
+                        {% endif %}
+
                     </div>
                     <h2 class="home-page">Plants</h2>
                     <p>View and manage your plant collection</p>
@@ -43,7 +47,12 @@
             <div class="box highlight">
                 <a href="{% url 'plant_care:perform-tasks' %}" class="text-decoration-none text-dark">
                     <div class="circle-wrapper">
-                        <img src="{% static 'img/tasks.png' %}" alt="Plant tasks">
+                        <img src="{% static 'img/tasks.png' %}" alt="Plant tasks" class="circle-image">
+                        {% if overdue_plant_count %}
+                            <div class="circle-text"><em>{{ overdue_plant_count }} tasks overdue</em></div>
+                        {% else %}
+                            <div class="circle-text"><em>No overdue tasks</em></div>
+                        {% endif %}
                     </div>
                     <h2 class="home-page">Tasks</h2>
                     <p>Keep track of watering, fertilizing, and repotting schedules</p>
@@ -55,6 +64,11 @@
                 <a href="{% url 'plant_care:care-history' %}" class="text-decoration-none text-dark">
                     <div class="circle-wrapper">
                         <img src="{% static 'img/history.png' %}" alt="Care history">
+                        {% if history_records %}
+                            <div class="circle-text"><em>{{ history_records }} tasks done this month</em></div>
+                        {% else %}
+                            <div class="circle-text"><em>No tasks done this month</em></div>
+                        {% endif %}
                     </div>
                     <h2 class="home-page">History</h2>
                     <p>Check past actions and logs</p>

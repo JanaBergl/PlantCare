@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -6,6 +6,7 @@ from django.db.models import QuerySet, Count, Q
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.utils import timezone
+from django.utils.timezone import now
 from django.views.generic import ListView, TemplateView, DetailView, CreateView, UpdateView, DeleteView, FormView
 from django.urls import reverse_lazy
 from plant_care.constants import TASK_CATEGORY_CHOICES, TASK_FREQUENCIES
@@ -25,8 +26,13 @@ class HomePageTemplateView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs) -> dict:
         """
-        Overrides parent method get_context_data, adds 'user_name' to context.
-        Adds 'overdue_plant_count' to context to show how many plants need care on the home page.
+        Adds additional context data to be displayed on the home page.
+
+        Context includes:
+            - user_name: Username of the logged-in user
+            - overdue_plant_count: The number of plants requring care
+            - number_of_plants: Total number of living plants in the database
+            - history_records: The number of tasks completed in the past 30 days
         """
         context = super().get_context_data(**kwargs)
         context["user_name"] = self.request.user.username
@@ -38,6 +44,11 @@ class HomePageTemplateView(LoginRequiredMixin, TemplateView):
             plants_requiring_care.add(warning["plant"])
 
         context["overdue_plant_count"] = len(plants_requiring_care)
+
+        context["number_of_plants"] = Plant.objects.filter(is_alive=True).count()
+
+        context["history_records"] = PlantCareHistory.objects.filter(
+            task_date__gte=timezone.now() - timedelta(days=30)).count()
 
         return context
 
@@ -53,8 +64,16 @@ class PlantListingView(LoginRequiredMixin, ListView):
 
     def get_queryset(self) -> QuerySet:
         """
-        Overrides parent method get_queryset, filters only living plants.
-        Allows user to filter by name or group and sort list by plant name, group name or date of purchase in ascending or descending order.
+        Allows user to filter and sort the list of living plants.
+
+        Filters:
+            - only includes living plants
+            - allows search by name or group name if 'filter' is provided in GET.
+
+        Sorting:
+            - default sorting by plant name
+            - supports sorting by plant name, group name or date of purchase
+            - allows changing between ascending or descending order
         """
         queryset = super().get_queryset().filter(is_alive=True)
 
@@ -82,8 +101,15 @@ class PlantGroupListingView(LoginRequiredMixin, ListView):
 
     def get_queryset(self) -> QuerySet:
         """
-        Overrides parent method get_queryset, counts the number of living plants in each group.
-        Allows user to sort list by group name or number of plants in a group in ascending or descending order.
+        Allows user to filter and sort the list of plant groups. Annotates each group with the count of living plants in it.
+
+        Annotation:
+            - num_plants: total count of living plants in a group
+
+        Sorting:
+            - default sorting by group name
+            - supports sorting by group name or number of plants in a group
+            - allows changing between ascending or descending order
         """
         queryset = PlantGroup.objects.annotate(
             num_plants=Count("plants", filter=Q(plants__is_alive=True))
@@ -114,7 +140,10 @@ class PlantsInGroupListingView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs) -> dict:
         """
-        Overrides parent method get_context_data, adds 'group' to context.
+        Adds additional context data to the list of plants.
+
+        Context includes:
+            - group: The PlantGroup object of the listed plants
         """
         context = super().get_context_data(**kwargs)
         group_id = self.kwargs.get("pk")
@@ -125,13 +154,24 @@ class PlantsInGroupListingView(LoginRequiredMixin, ListView):
 
     def get_queryset(self) -> QuerySet:
         """
-        Overrides parent method get_queryset, filters only alive plants inside a given group
-        and allows sorting by plant name or date of purchase in ascending or descending order.
+        Allows user to filter and sort the list of living plants in a given group.
+
+        Filters:
+            - only includes living plants in the group
+
+        Sorting:
+            - default sorting by plant name
+            - supports sorting by plant name or date of purchase.
+            - allows changing between ascending or descending order
         """
         group_id = self.kwargs.get("pk")
         group = get_object_or_404(PlantGroup, pk=group_id)
 
         queryset = Plant.objects.filter(group=group, is_alive=True)
+
+        search = self.request.GET.get("filter")
+        if search:
+            queryset = queryset.filter(name__icontains=search)
 
         ordering = self.request.GET.get("sort", "name")
         if ordering.lstrip("-") not in ["name", "date"]:
@@ -150,7 +190,12 @@ class PlantGraveyardListingView(LoginRequiredMixin, ListView):
 
     def get_queryset(self) -> QuerySet:
         """
-        Allows user to sort list by name, cause of death or date of death in ascending or descending order.
+        Allows user to sort the list of plants in the graveyard.
+
+        Sorting:
+            - default sorting by plant name
+            - supports sorting by plant name, cause of death or date of death
+            - allows changing between ascending or descending order
         """
         queryset = super().get_queryset()
 
@@ -173,13 +218,16 @@ class PlantCareHistoryListingView(LoginRequiredMixin, ListView):
 
     def get_queryset(self) -> QuerySet:
         """
-        Overrides parent method 'get_queryset', adds initial data for the plant care history logs ordered by date.
-        Allows user to search by plant/group name/task type and filter history logs for the last day/week/month.
+        Allows user to filter and sort the list of care history records.
+
+        Filters:
+            - allows search by task type, plant or group name if 'filter' is provided in GET.
+            - allows filtering by time period (day, week, or month) if 'time' is provided in GET.
+
+        Sorting:
+            - default sorting by task date (most recent first).
         """
         queryset = PlantCareHistory.objects.select_related('plant').order_by("-task_date")
-
-        # pres odkaz puvodne v detailview je filter v kwargs (URL parametry) ->self.kwargs.get("filter")
-        # pres search bar je v request.GET - GET parametry -> zmena oboje na GET, neni nutne dvakrat enter ZKONTROLOVAT
 
         search = self.request.GET.get("filter")
         if search:
@@ -189,7 +237,6 @@ class PlantCareHistoryListingView(LoginRequiredMixin, ListView):
                 Q(plant__name__istartswith=search)
             ).distinct()
 
-        # __gte = Django ORM greater than
         time = self.request.GET.get("time")
         if time:
             now = timezone.now()
@@ -214,7 +261,11 @@ class PlantDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs) -> dict:
         """
-        Overrides parent method get_context_data, adds task_frequencies and warnings to context.
+        Adds additional context data to be displayed on the detail page.
+
+        Context includes:
+            - task_frequencies: A list of tasks frequencies associated with the plant.
+            - plant_warnings: A list of plant warnings associated with the plant.
         """
         context = super().get_context_data(**kwargs)
         plant = self.get_object()
@@ -239,7 +290,10 @@ class PlantGroupDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs) -> dict:
         """
-        Overrides parent method get_context_data, adds 'num_plants' to context. 'num_plants' represents the number of plants in each group
+        Adds additional context data to be displayed on the group detail page.
+
+        Context includes:
+            - num_plants: Number of plants in the group.
         """
         context = super().get_context_data(**kwargs)
         context["num_plants"] = self.object.plants.filter(is_alive=True).count()
@@ -272,7 +326,7 @@ class PlantAndTaskFrequencyCreateGenericFormView(LoginRequiredMixin, FormView):
 
     def get_form_kwargs(self) -> dict:
         """
-        Overrides parent method get_form_kwargs, adds initial data for task frequencies based on TASK_FREQUENCIES.
+        Adds initial data for task frequencies based on default TASK_FREQUENCIES choices.
         """
         form_kwargs = super().get_form_kwargs()
 
@@ -285,8 +339,8 @@ class PlantAndTaskFrequencyCreateGenericFormView(LoginRequiredMixin, FormView):
 
     def form_valid(self, form) -> HttpResponseRedirect:
         """
-        Overrides parent method 'form_valid' to handle the process after the form is validated by user.
-        After validation creates a new plant object and its related task frequencies objects.
+        Handles the process after the form is validated by user.
+        After successful validation creates a new Plant object and its related PlantTaskFrequency objects.
         """
         plant = Plant.objects.create(
             name=form.cleaned_data["name"],
@@ -304,7 +358,7 @@ class PlantAndTaskFrequencyCreateGenericFormView(LoginRequiredMixin, FormView):
                     frequency=frequency,
                 )
 
-        self.plant = plant  # aby sel get_succes_url
+        self.plant = plant  # saving the plant object for use in get_success_url
 
         return super().form_valid(form)
 
@@ -342,6 +396,7 @@ class PlantAndTaskFrequencyUpdateGenericFormView(LoginRequiredMixin, FormView):
     def get_form_kwargs(self) -> dict:
         """
         Adds the plant object and initial data to the form.
+        If there are no existing PlantTaskFrequency objects for the plant, default value are used.
         """
         form_kwargs = super().get_form_kwargs()
         plant_id = self.kwargs.get("pk")
@@ -368,8 +423,8 @@ class PlantAndTaskFrequencyUpdateGenericFormView(LoginRequiredMixin, FormView):
 
     def form_valid(self, form) -> HttpResponseRedirect:
         """
-        Overrides parent method 'form_valid' to handle the form submisson and update the plant
-        and task frequency objects.
+        Handles the process after the form is validated by user.
+        After successful validation updates an existing Plant object and updates, creates or deletes its related PlantTaskFrequency objects based on the form data.
         """
 
         plant = form.plant  # TADY POTREBUJU PLANT OBJEKT, MUSIM HO ZISKAT Z FORM. PRES GET INITAL VZDY CHYBA
@@ -389,13 +444,13 @@ class PlantAndTaskFrequencyUpdateGenericFormView(LoginRequiredMixin, FormView):
                     task_existing.frequency = frequency
                     task_existing.save()
                 else:
-                    # if task frequency was not previously set, but it was added during update
+                    # if task frequency was not previously set, but it was added now during update
                     PlantTaskFrequency.objects.create(plant=plant, task_type=task, frequency=frequency)
             elif task_existing:
                 # if field is left empty, delete the task frequency
                 task_existing.delete()
 
-        self.plant = plant
+        self.plant = plant  # saving the plant object for use in get_success_url
 
         return super().form_valid(form)
 
@@ -557,7 +612,7 @@ class PlantCareHistoryDeleteView(LoginRequiredMixin, DeleteView):
 # CUSTOM VIEWS__________________________________________________________________________________________________________
 class DeadPlantView(LoginRequiredMixin, FormView):
     """
-    View for marking a plant as dead (is_alive=False).
+    View for marking a plant as dead (is_alive=False) by filling out a form with the cause of death.
     """
     template_name = "plant_dead_page_template.html"
     form_class = CauseOfDeathForm
@@ -565,7 +620,7 @@ class DeadPlantView(LoginRequiredMixin, FormView):
 
     def get_context_data(self, **kwargs) -> dict:
         """
-        Overrides parent method get_context_data, adds 'plant' to context.
+        Adds Plant object to the context data.
         """
         context = super().get_context_data(**kwargs)
 
@@ -575,8 +630,8 @@ class DeadPlantView(LoginRequiredMixin, FormView):
 
     def form_valid(self, form) -> HttpResponseRedirect:
         """
-        Overrides parent method 'form_valid' to handle the process after the form is validated by user.
-        If the form is validated, calls the 'move_to_graveyard' method on the plant object to mark it as dead, records the cause of death and moves it to the 'graveyard'.
+        Handles the process after the form is validated by user.
+        After successful validation, calls the 'move_to_graveyard' method on the plant object to mark it as dead, records the cause of death provided in the form and moves it to the 'graveyard'.
         """
         plant_id = self.kwargs['pk']
         plant = get_object_or_404(Plant, pk=plant_id)
@@ -584,15 +639,7 @@ class DeadPlantView(LoginRequiredMixin, FormView):
 
         plant.move_to_graveyard(reason)
 
-        self.plant = plant
-
         return redirect(self.get_success_url())
-
-    def get_success_url(self) -> str:
-        """
-        Returns the URL to the detail view of the newly deceased plant.
-        """
-        return self.plant.get_absolute_url()
 
 
 class PerformTaskView(LoginRequiredMixin, FormView):
@@ -606,8 +653,13 @@ class PerformTaskView(LoginRequiredMixin, FormView):
 
     def get_context_data(self, **kwargs) -> dict:
         """
-        Adds only living plants and a list of plants with active warnings for overdue tasks to the context.
-        Allows search by plant name or group name.
+        Adds additional data to the context. Allows search by plant name or group name.
+        Allows sorting by plant or group name in ascending or descending order if 'sort' is provided in GET.
+
+        Context includes:
+            - plants: All living plants, filtered by name or group if 'filter' is provided in GET.
+            - plants_in_danger: Set of plants with active warnings for overdue tasks.
+
         """
         context = super().get_context_data(**kwargs)
 
@@ -616,6 +668,17 @@ class PerformTaskView(LoginRequiredMixin, FormView):
         plants_queryset = Plant.objects.filter(is_alive=True)
         if search:
             plants_queryset = plants_queryset.filter(Q(name__icontains=search) | Q(group__group_name__icontains=search))
+
+        sort_by = self.request.GET.get("sort", "name")
+        reverse = False
+        if sort_by.startswith("-"):
+            reverse = True
+            sort_by = sort_by.lstrip("-")
+
+        if sort_by == "group":
+            plants_queryset = plants_queryset.order_by("group__group_name" if not reverse else "-group__group_name")
+        else:
+            plants_queryset = plants_queryset.order_by("name" if not reverse else "-name")
 
         context["plants"] = plants_queryset
         context["plants_in_danger"] = {warning["plant"].id for warning in show_care_warnings()}
@@ -647,14 +710,17 @@ class PerformTaskView(LoginRequiredMixin, FormView):
 class PlantCareOverdueWarningsView(LoginRequiredMixin, TemplateView):
     """
     View to display overdue care warnings for plants based on their task frequency.
-    If a task has never been done before, then the plant care warning is not displayed.
+    If a task has never been done before, the plant care warning is not displayed.
     """
     template_name = "plant_task_overdue_warnings.html"
 
     def get_context_data(self, **kwargs) -> dict:
         """
-        Overrides parent method 'get_context_data', adds overdue care warnings for plants to the context.
-        Allows sorting of care warnings table by plant or group name, task type or number of days overdue.
+        Adds additional data to the context.
+        Allows sorting by plant or group name, task type or number of days overdue in ascending or descending order if 'sort' is provided in GET.
+
+        Context includes:
+            - warnings: list of warnings for overdue tasks based on plants task frequency and last record in care history.
         """
         context = super().get_context_data(**kwargs)
         warnings = show_care_warnings()

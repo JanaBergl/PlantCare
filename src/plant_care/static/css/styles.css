@@ -112,7 +112,7 @@ html, body {
 }
 
 
-#logo img{
+#logo img {
     transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
@@ -121,6 +121,7 @@ html, body {
 }
 
 .circle-wrapper {
+    position: relative;
     width: 120px;
     height: 120px;
     border-radius: 50%;
@@ -130,16 +131,64 @@ html, body {
     justify-content: center;
     overflow: hidden;
     margin: 0 auto 20px auto;
+    cursor: pointer;
+    background-color: white;
+
 }
+
+.circle-image {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+
+}
+
+
+.circle-text {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: seagreen;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    font-size: 14px;
+    opacity: 0;
+    z-index: 1;
+
+}
+
+/* Efekt při najetí myší */
+.circle-wrapper:hover .circle-image {
+    opacity: 0;
+}
+
+.circle-wrapper:hover .circle-text {
+    opacity: 1;
+}
+
 
 .home-page {
-    color: rgba(5,47,23,0.99);
+    color: rgba(5, 47, 23, 0.99);
 
 }
+
 @keyframes shine {
-    0% { color: darkgreen; }
-    50% { color: seagreen; }
-    100% { color: mediumseagreen; }
+    0% {
+        color: darkgreen;
+    }
+    50% {
+        color: seagreen;
+    }
+    100% {
+        color: mediumseagreen;
+    }
 }
 
 .home-page:hover {
@@ -157,7 +206,7 @@ html, body {
 }
 
 .home-page-welcome {
-    color: rgba(5,47,23,0.99);
+    color: rgba(5, 47, 23, 0.99);
 }
 
 
