@@ -1,9 +1,11 @@
+
+
 TASK_CATEGORY_CHOICES = [
     ("Watering", "watered"),
     ("Fertilizing", "fertilized"),
     ("Repotting", "repotted"),
     ("Vitamin treatment", "given vitamins"),
-    ("Insecticide treatment", "treated with insecticide")
+    ("Insecticide treatment", "treated with insecticide"),
 ]
 
 TASK_FREQUENCIES = {

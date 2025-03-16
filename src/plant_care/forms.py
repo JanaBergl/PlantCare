@@ -23,6 +23,16 @@ class PlantGroupModelForm(forms.ModelForm):
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': ''}),
         }
 
+    def clean_group_name(self):
+        """
+        Capitalizes the group name before saving.
+        """
+        group_name = self.cleaned_data.get('group_name')
+        if group_name:
+            group_name = group_name.capitalize()
+
+        return group_name
+
 
 class CauseOfDeathForm(forms.Form):
     """
@@ -75,45 +85,19 @@ class BasePlantAndTaskGenericForm(forms.Form):
     def clean_name(self):
         """
         Custom validation for name field when creating a new plant.
-        Makes sure no duplicate plant names for living plants are created.
+        Makes sure no duplicate plant names for living plants are created and titles the name.
         """
-        name = self.cleaned_data.get('name')
+        name = self.cleaned_data.get("name")
 
-        if Plant.objects.filter(is_alive=True, name__iexact=name).exists():
-            raise ValidationError("Plant with this name already exists.")
+        if name:
+            name = name.title()
 
-        return name
-
-
-class PlantAndTaskGenericUpdateForm(BasePlantAndTaskGenericForm):
-    """
-    Form based on parent BasePlantAndTaskForm to update Plant and PlantTaskFrequency objects at the same time.
-
-    https://forum.djangoproject.com/t/using-request-user-in-forms-py/19184/4 - pop z init?
-    https://sayari3.com/articles/16-how-to-pass-user-object-to-django-form/
-    """
-
-    # BEZ POP A PRI POUZIVANI GET_INITIAL V UPDATE VZDY CHYBA TypeError at /plants/update-plant/22/
-    # BaseForm.__init__() got an unexpected keyword argument 'plant'
-    # Request Method:	POST
-    # -> jedine co zatim funguje je toto s .pop
-
-    def __init__(self, *args, **kwargs) -> None:
-        """
-        Initializes the form, saves a given 'plant' argument and removes it to prevent TypeError.
-        """
-        self.plant = kwargs.pop('plant', None)
-        super().__init__(*args, **kwargs)
-
-    def clean_name(self):
-        """
-        Custom validation for name field when updating a plant.
-        Allows the name to remain the same, but prevents duplicates when changed.
-        """
-        name = self.cleaned_data.get('name')
-
-        if self.plant and self.plant.name != name:
-            if Plant.objects.filter(is_alive=True, name=name).exists():
+        if hasattr(self, "plant"): # if it's an update
+            if self.plant.name.lower() != name.lower():
+                if Plant.objects.filter(is_alive=True, name__iexact=name).exists():
+                    raise ValidationError("Plant with this name already exists.")
+        else:
+            if Plant.objects.filter(is_alive=True, name__iexact=name).exists():
                 raise ValidationError("Plant with this name already exists.")
 
         return name

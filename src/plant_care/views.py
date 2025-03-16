@@ -1,5 +1,4 @@
 from datetime import timedelta
-
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import QuerySet, Count, Q
@@ -10,8 +9,7 @@ from django.utils.timezone import now
 from django.views.generic import ListView, TemplateView, DetailView, CreateView, UpdateView, DeleteView, FormView
 from django.urls import reverse_lazy
 from plant_care.constants import TASK_CATEGORY_CHOICES, TASK_FREQUENCIES
-from plant_care.forms import PlantGroupModelForm, CauseOfDeathForm, PlantTaskGenericForm, \
-    PlantAndTaskGenericUpdateForm, BasePlantAndTaskGenericForm, PlantCareHistoryModelForm
+from plant_care.forms import PlantGroupModelForm, CauseOfDeathForm, PlantTaskGenericForm, BasePlantAndTaskGenericForm, PlantCareHistoryModelForm
 from plant_care.models import Plant, PlantGroup, PlantGraveyard, PlantTaskFrequency, PlantCareHistory, \
     get_default_frequency
 from plant_care.utils import show_care_warnings
@@ -31,6 +29,7 @@ class HomePageTemplateView(LoginRequiredMixin, TemplateView):
         Context includes:
             - user_name: Username of the logged-in user
             - overdue_plant_count: The number of plants requring care
+            - overdue_task_count: The number of overdue tasks
             - number_of_plants: Total number of living plants in the database
             - history_records: The number of tasks completed in the past 30 days
         """
@@ -44,6 +43,8 @@ class HomePageTemplateView(LoginRequiredMixin, TemplateView):
             plants_requiring_care.add(warning["plant"])
 
         context["overdue_plant_count"] = len(plants_requiring_care)
+
+        context["overdue_task_count"] = len(overdue)
 
         context["number_of_plants"] = Plant.objects.filter(is_alive=True).count()
 
@@ -72,7 +73,7 @@ class PlantListingView(LoginRequiredMixin, ListView):
 
         Sorting:
             - default sorting by plant name
-            - supports sorting by plant name, group name or date of purchase
+            - supports sorting by plant name, group name or date of purchase if 'sort' is provided in GET.
             - allows changing between ascending or descending order
         """
         queryset = super().get_queryset().filter(is_alive=True)
@@ -101,14 +102,14 @@ class PlantGroupListingView(LoginRequiredMixin, ListView):
 
     def get_queryset(self) -> QuerySet:
         """
-        Allows user to filter and sort the list of plant groups. Annotates each group with the count of living plants in it.
+        Allows user to sort the list of plant groups. Annotates each group with the count of living plants in it.
 
         Annotation:
             - num_plants: total count of living plants in a group
 
         Sorting:
             - default sorting by group name
-            - supports sorting by group name or number of plants in a group
+            - supports sorting by group name or number of plants in a group if 'sort' is provided in GET.
             - allows changing between ascending or descending order
         """
         queryset = PlantGroup.objects.annotate(
@@ -158,10 +159,11 @@ class PlantsInGroupListingView(LoginRequiredMixin, ListView):
 
         Filters:
             - only includes living plants in the group
+            - allows search by plant name if 'filter' is provided in GET.
 
         Sorting:
             - default sorting by plant name
-            - supports sorting by plant name or date of purchase.
+            - supports sorting by plant name or date of purchase if 'sort' is provided in GET.
             - allows changing between ascending or descending order
         """
         group_id = self.kwargs.get("pk")
@@ -391,18 +393,14 @@ class PlantAndTaskFrequencyUpdateGenericFormView(LoginRequiredMixin, FormView):
     View for updating a plant and its related task frequencies.
     """
     template_name = "plant_update_page_template.html"
-    form_class = PlantAndTaskGenericUpdateForm
 
-    def get_form_kwargs(self) -> dict:
+    def get_form(self, form_class=None):
         """
         Adds the plant object and initial data to the form.
-        If there are no existing PlantTaskFrequency objects for the plant, default value are used.
+        If there are no existing PlantTaskFrequency objects for the plant, default values are used.
         """
-        form_kwargs = super().get_form_kwargs()
         plant_id = self.kwargs.get("pk")
         plant = get_object_or_404(Plant, pk=plant_id)
-
-        form_kwargs["plant"] = plant
 
         initial_data = {
             "name": plant.name,
@@ -418,8 +416,14 @@ class PlantAndTaskFrequencyUpdateGenericFormView(LoginRequiredMixin, FormView):
             else:
                 initial_data[task] = get_default_frequency(task)
 
-        form_kwargs["initial"] = initial_data
-        return form_kwargs
+        if self.request.method == "POST":
+            form = BasePlantAndTaskGenericForm(self.request.POST)
+        else:
+            form = BasePlantAndTaskGenericForm(initial=initial_data)
+
+        form.plant = plant
+
+        return form
 
     def form_valid(self, form) -> HttpResponseRedirect:
         """
@@ -427,13 +431,12 @@ class PlantAndTaskFrequencyUpdateGenericFormView(LoginRequiredMixin, FormView):
         After successful validation updates an existing Plant object and updates, creates or deletes its related PlantTaskFrequency objects based on the form data.
         """
 
-        plant = form.plant  # TADY POTREBUJU PLANT OBJEKT, MUSIM HO ZISKAT Z FORM. PRES GET INITAL VZDY CHYBA
+        plant = form.plant
 
         plant.name = form.cleaned_data["name"]
         plant.group = form.cleaned_data["group"]
         plant.date = form.cleaned_data["date"]
         plant.notes = form.cleaned_data["notes"]
-        plant.save()
 
         for task, task_display in TASK_CATEGORY_CHOICES:
             frequency = form.cleaned_data.get(task)
@@ -450,82 +453,9 @@ class PlantAndTaskFrequencyUpdateGenericFormView(LoginRequiredMixin, FormView):
                 # if field is left empty, delete the task frequency
                 task_existing.delete()
 
-        self.plant = plant  # saving the plant object for use in get_success_url
-
-        return super().form_valid(form)
-
-    def get_success_url(self) -> str:
-        """
-        Returns the URL to the detail view of the newly updated plant.
-        """
-        return self.plant.get_absolute_url()
-
-
-class NEFUNGUJEPlantAndTaskFrequencyUpdateGenericFormView(LoginRequiredMixin, FormView):
-    """
-    # BEZ kwargs.pop("plant") v init formu nefunguje. PRI POUZIVANI GET_INITIAL V UPDATE VZDY CHYBA TypeError at /plants/update-plant/22/
-    # BaseForm.__init__() got an unexpected keyword argument 'plant'
-    # Request Method:	POST
-    # -> jedine co zatim funguje je verze vyse a .pop v init formulare
-    """
-    template_name = "plant_update_page_template.html"
-    form_class = BasePlantAndTaskGenericForm
-
-    def get_initial(self) -> dict:
-        """
-        Overrides parent method get_initial, adds initial data for the plant and its task frequencies.
-        """
-        initial_data = super().get_initial()
-        plant_id = self.kwargs.get("pk")
-        plant = get_object_or_404(Plant, pk=plant_id)
-
-        initial_data = {
-            "name": plant.name,
-            "group": plant.group,
-            "date": plant.date,
-            "notes": plant.notes,
-        }
-
-        for task, task_display in TASK_CATEGORY_CHOICES:
-            existing_value = plant.task_frequencies.filter(task_type=task).first()
-            if existing_value:
-                initial_data[task] = existing_value.frequency
-            else:
-                initial_data[task] = get_default_frequency(task)
-
-        return initial_data
-
-    def form_valid(self, form) -> HttpResponseRedirect:
-        """
-        Overrides parent method 'form_valid' to handle the form submisson and update the plant
-        and task frequency objects.
-        """
-        plant = form.plant
-        plant.name = form.cleaned_data["name"]
-        plant.group = form.cleaned_data["group"]
-        plant.date = form.cleaned_data["date"]
-        plant.notes = form.cleaned_data["notes"]
         plant.save()
 
-        for task, task_display in TASK_CATEGORY_CHOICES:
-            frequency = form.cleaned_data.get(task)
-            task_existing = plant.task_frequencies.filter(task_type=task).first()
-
-            if frequency is not None:
-                if task_existing:
-                    task_existing.frequency = frequency
-                    task_existing.save()
-                else:
-                    # if task frequency was not previously set, but it was added during update
-                    PlantTaskFrequency.objects.create(plant=plant, task_type=task, frequency=frequency)
-            elif task_existing:
-                # if field is left empty, set to default
-                default_frequency = TASK_FREQUENCIES.get(task, None)
-                task_existing.frequency = default_frequency
-                task_existing.save()
-
-        self.plant = plant
-
+        self.plant = plant  # saving the plant object for use in get_success_url
         return super().form_valid(form)
 
     def get_success_url(self) -> str:
@@ -579,8 +509,7 @@ class PlantDeleteView(LoginRequiredMixin, DeleteView):
 
 class PlantGroupDeleteView(LoginRequiredMixin, DeleteView):
     """
-    View for deleting an existing plant group.
-    'Uncategorized' group cannot be deleted.
+    View for deleting an existing plant group. All groups except for 'Uncategorized' can be deleted.
     """
     template_name = "plant_group_delete_page_template.html"
     model = PlantGroup
@@ -612,7 +541,7 @@ class PlantCareHistoryDeleteView(LoginRequiredMixin, DeleteView):
 # CUSTOM VIEWS__________________________________________________________________________________________________________
 class DeadPlantView(LoginRequiredMixin, FormView):
     """
-    View for marking a plant as dead (is_alive=False) by filling out a form with the cause of death.
+    View for marking a plant as dead (is_alive=False) by filling out a form with the cause of death and calling move_to_graveyard().
     """
     template_name = "plant_dead_page_template.html"
     form_class = CauseOfDeathForm
@@ -626,6 +555,7 @@ class DeadPlantView(LoginRequiredMixin, FormView):
 
         plant_id = self.kwargs.get('pk')
         context["plant"] = get_object_or_404(Plant, pk=plant_id)
+
         return context
 
     def form_valid(self, form) -> HttpResponseRedirect:
@@ -639,7 +569,7 @@ class DeadPlantView(LoginRequiredMixin, FormView):
 
         plant.move_to_graveyard(reason)
 
-        return redirect(self.get_success_url())
+        return super().form_valid(form)
 
 
 class PerformTaskView(LoginRequiredMixin, FormView):
@@ -653,7 +583,7 @@ class PerformTaskView(LoginRequiredMixin, FormView):
 
     def get_context_data(self, **kwargs) -> dict:
         """
-        Adds additional data to the context. Allows search by plant name or group name.
+        Adds additional data to the context. Allows filtering by plant name or group name if 'filter' is provided in GET.
         Allows sorting by plant or group name in ascending or descending order if 'sort' is provided in GET.
 
         Context includes:
@@ -725,20 +655,23 @@ class PlantCareOverdueWarningsView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         warnings = show_care_warnings()
 
-        sort_by = self.request.GET.get("sort", "plant.name")
+        sort_by = self.request.GET.get("sort", "-days_since_task")
         reverse = False
+
         if sort_by.startswith("-"):
             reverse = True
             sort_by = sort_by.lstrip("-")
 
-        if sort_by == "group":
+        if sort_by == "plant":
+            warnings = sorted(warnings, key=lambda x: x["plant"].name, reverse=reverse)
+        elif sort_by == "group":
             warnings = sorted(warnings, key=lambda x: x["group"].group_name, reverse=reverse)
         elif sort_by == "task":
             warnings = sorted(warnings, key=lambda x: x["task_type"], reverse=reverse)
         elif sort_by == "days_overdue":
             warnings = sorted(warnings, key=lambda x: x["days_since_task"], reverse=reverse)
         else:
-            warnings = sorted(warnings, key=lambda x: x["plant"].name, reverse=reverse)
+            warnings = sorted(warnings, key=lambda x: x["days_since_task"], reverse=reverse)
 
         context["warnings"] = warnings
         return context

@@ -186,4 +186,4 @@ class PlantGraveyard(models.Model):
         return f"{self.plant.name} died on {self.date_of_death.strftime('%d/%m/%Y')} due to {self.cause_of_death}"
 
     def __repr__(self) -> str:
-        return f"PlantGraveyard(plant= {self.plant.name}({self.plant.id}), date_of_death={self.date_of_death!r}, cause_of_death={self.cause_of_death})"
+        return f"PlantGraveyard(plant= {self.plant.name}({self.plant.id}), date_of_death={self.date_of_death}, cause_of_death={self.cause_of_death})"

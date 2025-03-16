@@ -9,7 +9,8 @@
 {% block banner %}
     <section id="banner">
         <header>
-            <h2 class="home-page-welcome">Hello, {% if user_name %}<em class="text-success">{{ user_name }}</em> !{% else %}user!{% endif %} Welcome to Plant Care App!</h2>
+            <h2 class="home-page-welcome">Hello, {% if user_name %}<em class="text-success">{{ user_name }}</em>
+                !{% else %}user!{% endif %} Welcome to Plant Care App!</h2>
             {% if overdue_plant_count == 1 %}
                 <h5 class="home-page-warning"><a href="{% url 'plant_care:warnings' %}"
                                                  class="text-decoration-none text-dark">There is <b
@@ -48,10 +49,10 @@
                 <a href="{% url 'plant_care:perform-tasks' %}" class="text-decoration-none text-dark">
                     <div class="circle-wrapper">
                         <img src="{% static 'img/tasks.png' %}" alt="Plant tasks" class="circle-image">
-                        {% if overdue_plant_count %}
-                            <div class="circle-text"><em>{{ overdue_plant_count }} tasks overdue</em></div>
+                        {% if overdue_task_count %}
+                            <div class="circle-text"><em>{{ overdue_task_count }} tasks overdue</em></div>
                         {% else %}
-                            <div class="circle-text"><em>No overdue tasks</em></div>
+                            <div class="circle-text"><em>0 overdue tasks</em></div>
                         {% endif %}
                     </div>
                     <h2 class="home-page">Tasks</h2>

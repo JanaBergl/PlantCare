@@ -10,7 +10,7 @@
     <div class="container mt-5 mb-5">
         <p class="view-header text-center fs-3 m-0">Update plant details </p>
         <div class="col-md-6 mx-auto">
-            <form method="post" action=".">
+            <form method="post" action="." autocomplete="off">
                 {% csrf_token %}
                 {% bootstrap_form form %}
                 <br>

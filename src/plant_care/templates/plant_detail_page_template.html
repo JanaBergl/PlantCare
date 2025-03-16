@@ -83,7 +83,9 @@
             </table>
         </div>
         <div class="d-flex justify-content-center mt-4">
-            <a href="{% url 'plant_care:perform-tasks' %}?filter={{ plant.name }}" class="btn">🫗 Care</a>
+            {% if plant.is_alive %}
+                <a href="{% url 'plant_care:perform-tasks' %}?filter={{ plant.name }}" class="btn">🫗 Care</a>
+            {% endif %}
             <a href="{% url 'plant_care:plant-update' plant.pk %}" class="btn me-2">✏️ Update</a>
             <a href="{% url 'plant_care:plant-delete' plant.pk %}" class="btn me-2">🗑️ Delete</a>
             <a href="{% url 'plant_care:dead-plant' plant.pk %}" class="btn">🪦 RIP</a>

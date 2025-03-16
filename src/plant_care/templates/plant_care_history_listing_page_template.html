@@ -6,36 +6,37 @@
 {% block bootstrap5_title %}Care History{% endblock %}
 
 {% block content %}
-    {% if history %}
-        <div class="container mt-3 mb-3">
-            <div class="d-flex flex-column align-items-center">
-                <br>
-                <div class="d-flex justify-content-center w-75 mb-4">
-                    <a class="view-header fs-3 m-0 text-center text-decoration-none" href="{% url 'plant_care:care-history' %}">🌱 Care history 🌱</a>
-                </div>
-
-                <div class="d-flex justify-content-between w-75 mb-4 mt-2">
-                    <div class="d-flex w-50">
-                        <a href="{% url 'plant_care:care-history' %}?filter={{ request.GET.filter }}"
-                           class="btn btn-animace btn-success flex-grow-1 ms-2">All</a>
-                        <a href="{% url 'plant_care:care-history' %}?filter={{ request.GET.filter }}&time=day"
-                           class="btn btn-animace btn-success flex-grow-1 ms-2">Today</a>
-                        <a href="{% url 'plant_care:care-history' %}?filter={{ request.GET.filter }}&time=week"
-                           class="btn btn-animace btn-success flex-grow-1 ms-2">Last Week</a>
-                        <a href="{% url 'plant_care:care-history' %}?filter={{ request.GET.filter }}&time=month"
-                           class="btn btn-animace btn-success flex-grow-1 ms-2">Last Month</a>
-                    </div>
-                    <form method="get" action="{% url 'plant_care:care-history' %}"
-                          class="d-flex" style="width: auto;">
-                        <input type="text" name="filter" placeholder="Search task/plant/group"
-                               value="{{ request.GET.filter }}" class="text-center form-control">
-                        <button type="submit" class="btn ms-2 btn-animace">🔎</button>
-                    </form>
-
-                </div>
+    <div class="container mt-3 mb-3">
+        <div class="d-flex flex-column align-items-center">
+            <br>
+            <div class="d-flex justify-content-center w-75 mb-4">
+                <a class="view-header fs-3 m-0 text-center text-decoration-none"
+                   href="{% url 'plant_care:care-history' %}">🌱 Care history 🌱</a>
             </div>
 
+            <div class="d-flex justify-content-between w-75 mb-4 mt-2">
+                <div class="d-flex w-50">
+                    <a href="{% url 'plant_care:care-history' %}?filter={{ request.GET.filter }}"
+                       class="btn btn-animace btn-success flex-grow-1 ms-2">All</a>
+                    <a href="{% url 'plant_care:care-history' %}?filter={{ request.GET.filter }}&time=day"
+                       class="btn btn-animace btn-success flex-grow-1 ms-2">Today</a>
+                    <a href="{% url 'plant_care:care-history' %}?filter={{ request.GET.filter }}&time=week"
+                       class="btn btn-animace btn-success flex-grow-1 ms-2">Last Week</a>
+                    <a href="{% url 'plant_care:care-history' %}?filter={{ request.GET.filter }}&time=month"
+                       class="btn btn-animace btn-success flex-grow-1 ms-2">Last Month</a>
+                </div>
+                <form method="get" action="{% url 'plant_care:care-history' %}"
+                      autocomplete="off" class="d-flex" style="width: auto;">
+                    <input type="text" name="filter" placeholder="Search task/plant/group"
+                           value="{{ request.GET.filter }}" class="text-center form-control">
+                    <button type="submit" class="btn ms-2 btn-animace">🔎</button>
+                </form>
+
+            </div>
         </div>
+
+    </div>
+    {% if history %}
 
         <div class="d-flex justify-content-center align-items-center mb-5">
             <table class="table table-striped table-bordered table-sm table-hover"
@@ -71,11 +72,26 @@
             </table>
         </div>
     {% else %}
-        <p class="text-center mt-5">There is no care history.</p>
+        {% if request.GET.filter %}
+            <div class="d-flex justify-content-center align-items-center mb-3">
+                <p class="view-header text-center mt-5">There are no history records for "{{ request.GET.filter }}"</p>
+            </div>
+        {% elif plant %}
+            <div class="d-flex justify-content-center align-items-center mb-3">
+                <p class="view-header text-center mt-5">There are no history records for "{{ plant.name }}"</p>
+            </div>
+        {% else %}
+            <div class="d-flex justify-content-center align-items-center mb-3">
+                <p class="view-header text-center mt-5">There are no history records.</p>
+            </div>
+        {% endif %}
         <div class="container">
             <div class="d-flex justify-content-center mb-2">
                 <a href="{% url 'plant_care:perform-tasks' %}" id="a-button"
-                   class="btn btn-success btn-animace"><b>Tasks</b></a>
+                   class="btn btn-success btn-animace me-3">Tasks</a>
+                <a href="{{ request.META.HTTP_REFERER|default:'#'|escape }}"
+                   class="btn btn-success btn-animace">Back</a>
+
             </div>
         </div>
     {% endif %}

@@ -12,25 +12,29 @@
 
 {% block bootstrap5_content %}
     <div id="page-wrapper">
-    <!-- Header -->
+        <!-- Header -->
         <div id="header">
             <div class="container-fluid d-flex justify-content-between align-items-center py-3">
                 <h4 class="mb-0">
                     <a href="/" id="logo" class="text-decoration-none text-dark">
-                        <img src="{% static 'img/favicon.ico' %}" alt="Plant Care Logo" class="img-fluid" style="max-height: 35px;">  Plant Care
+                        <img src="{% static 'img/favicon.ico' %}" alt="Plant Care Logo" class="img-fluid"
+                             style="max-height: 35px;"> Plant Care
                     </a>
                 </h4>
                 <nav id="nav" class="nav">
                     <a href="/" class="nav-link text-dark">Home</a>
                     <div class="dropdown">
-                        <a href="{% url 'plant_care:plant-list' %}" class="nav-link text-dark dropdown-toggle" id="navbarDropdown"
+                        <a href="{% url 'plant_care:plant-list' %}" class="nav-link text-dark dropdown-toggle"
+                           id="navbarDropdown"
                            data-bs-toggle="dropdown" aria-expanded="false">
                             Plants
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <li><a class="dropdown-item" href="{% url 'plant_care:plant-list' %}">Plant list</a></li>
-                            <li><a class="dropdown-item" href="{% url 'plant_care:plant-create' %}">Add new plant</a></li>
-                            <li><a class="dropdown-item" href="{% url 'plant_care:plant-graveyard-list' %}">Plant graveyard</a></li>
+                            <li><a class="dropdown-item" href="{% url 'plant_care:plant-create' %}">Add new plant</a>
+                            </li>
+                            <li><a class="dropdown-item" href="{% url 'plant_care:plant-graveyard-list' %}">Plant
+                                graveyard</a></li>
                         </ul>
                     </div>
                     <div class="dropdown">
@@ -39,8 +43,10 @@
                             Groups
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="{% url 'plant_care:plant-group-list' %}">Group list</a></li>
-                            <li><a class="dropdown-item" href="{% url 'plant_care:plant-group-create' %}">Add new group</a></li>
+                            <li><a class="dropdown-item" href="{% url 'plant_care:plant-group-list' %}">Group list</a>
+                            </li>
+                            <li><a class="dropdown-item" href="{% url 'plant_care:plant-group-create' %}">Add new
+                                group</a></li>
                         </ul>
                     </div>
                     <div class="dropdown">
@@ -69,7 +75,7 @@
                 {% endfor %}
             </div>
         {% endif %}
-           <!-- Main content -->
+        <!-- Main content -->
         <section class="wrapper style1">
             <div class="container">
                 {% block content %}
@@ -82,7 +88,8 @@
         <div id="footer">
             <div class="container-fluid d-flex justify-content-between align-items-center">
                 <div>
-                    <a href="https://github.com/JanaBergl/django-project" target="_blank"><img src="{% static 'img/github.svg' %}" alt="GitHub" style="width: 48px; height: 48px;"></a>
+                    <a href="https://github.com/JanaBergl/django-project" target="_blank"><img
+                            src="{% static 'img/github.svg' %}" alt="GitHub" style="width: 48px; height: 48px;"></a>
                 </div>
 
                 <div class="d-flex justify-content-start align-items-center me-3 ms-3">
@@ -110,7 +117,7 @@
             </div>
         </div>
 
-</div>
+    </div>
 
     <!-- Scripts -->
     {% block extra_scripts %}

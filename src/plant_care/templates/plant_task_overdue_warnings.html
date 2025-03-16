@@ -22,10 +22,18 @@
                        style="width: 75%">
                     <thead class="table-success">
                     <tr>
-                        <th><a class="text-decoration-none text-dark" href="?sort={% if request.GET.sort == "plant" %}-plant{% else %}plant{% endif %}">Plant</a></th>
-                        <th><a class="text-decoration-none text-dark" href="?sort={% if request.GET.sort == "group" %}-group{% else %}group{% endif %}">Group</a></th>
-                        <th><a class="text-decoration-none text-dark" href="?sort={% if request.GET.sort == "task" %}-task{% else %}task{% endif %}">Task</a></th>
-                        <th><a class="text-decoration-none text-dark" href="?sort={% if request.GET.sort == "days_overdue" %}-days_overdue{% else %}days_overdue{% endif %}">Days overdue</a></th>
+                        <th><a class="text-decoration-none text-dark"
+                               href="?sort={% if request.GET.sort == "plant" %}-plant{% else %}plant{% endif %}">Plant</a>
+                        </th>
+                        <th><a class="text-decoration-none text-dark"
+                               href="?sort={% if request.GET.sort == "group" %}-group{% else %}group{% endif %}">Group</a>
+                        </th>
+                        <th><a class="text-decoration-none text-dark"
+                               href="?sort={% if request.GET.sort == "task" %}-task{% else %}task{% endif %}">Task</a>
+                        </th>
+                        <th><a class="text-decoration-none text-dark"
+                               href="?sort={% if request.GET.sort == "days_since_task" %}-days_since_task{% else %}days_since_task{% endif %}">Days
+                            overdue</a></th>
                     </tr>
                     </thead>
                     <tbody>
@@ -52,7 +60,8 @@
         <p class="text-center mt-5">No plant needs care at the moment. Great job!</p>
         <div class="container">
             <div class="d-flex justify-content-center mb-2">
-                <a href="{% url 'plant_care:care-history' %}" class="btn btn-outline-success btn-animace"><b>Care History</b></a>
+                <a href="{% url 'plant_care:care-history' %}" class="btn btn-outline-success btn-animace"><b>Care
+                    History</b></a>
             </div>
         </div>
     {% endif %}

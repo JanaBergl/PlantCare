@@ -20,9 +20,15 @@
                        style="width: 75%">
                     <thead class="table-success">
                     <tr>
-                        <th style="width: 25%"><a class="text-decoration-none text-dark" href="?sort={% if request.GET.sort == 'plant__name' %}-plant__name{% else %}plant__name{% endif %}">Plant</a></th>
-                        <th style="width: 25%"><a class="text-decoration-none text-dark" href="?sort={% if request.GET.sort == 'date_of_death' %}-date_of_death{% else %}date_of_death{% endif %}">Date of death</a></th>
-                        <th style="width: 25%"><a class="text-decoration-none text-dark" href="?sort={% if request.GET.sort == 'cause_of_death' %}-cause_of_death{% else %}cause_of_death{% endif %}">Cause of death</a></th>
+                        <th style="width: 25%"><a class="text-decoration-none text-dark"
+                                                  href="?sort={% if request.GET.sort == 'plant__name' %}-plant__name{% else %}plant__name{% endif %}">Plant</a>
+                        </th>
+                        <th style="width: 25%"><a class="text-decoration-none text-dark"
+                                                  href="?sort={% if request.GET.sort == 'date_of_death' %}-date_of_death{% else %}date_of_death{% endif %}">Date
+                            of death</a></th>
+                        <th style="width: 25%"><a class="text-decoration-none text-dark"
+                                                  href="?sort={% if request.GET.sort == 'cause_of_death' %}-cause_of_death{% else %}cause_of_death{% endif %}">Cause
+                            of death</a></th>
                         <th class="text-center" style="width: 12%">Detail</th>
                         <th class="text-center" style="width: 12%">Delete</th>
                     </tr>
@@ -30,13 +36,17 @@
                     <tbody>
                     {% for plant in graveyard %}
                         <tr>
-                            <td><a class="text-decoration-none text-dark" href="{% url 'plant_care:plant-detail' plant.plant.pk %}">{{ plant.plant.name }}</a></td>
+                            <td><a class="text-decoration-none text-dark"
+                                   href="{% url 'plant_care:plant-detail' plant.plant.pk %}">{{ plant.plant.name }}</a>
+                            </td>
                             <td>{{ plant.date_of_death|date:"d. m. Y" }}</td>
                             <td>{{ plant.get_cause_of_death_display }}</td>
                             <td class="text-center">
-                                <a class="text-decoration-none" href="{% url 'plant_care:plant-detail' plant.plant.pk %}">🔍</a>
+                                <a class="text-decoration-none"
+                                   href="{% url 'plant_care:plant-detail' plant.plant.pk %}">🔍</a>
                             <td class="text-center">
-                                <a class="text-decoration-none" href="{% url 'plant_care:plant-delete' plant.plant.pk %}">🗑️</a>
+                                <a class="text-decoration-none"
+                                   href="{% url 'plant_care:plant-delete' plant.plant.pk %}">🗑️</a>
 
                         </tr>
                     {% endfor %}
@@ -45,7 +55,7 @@
             </div>
         </div>
     {% else %}
-        <p class="text-center mt-5">There are no plants in the graveyard.</p>
+        <p class="view-header text-center mt-5">There are no plants in the graveyard.</p>
     {% endif %}
 
 {% endblock %}

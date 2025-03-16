@@ -22,7 +22,9 @@ class AccountLoginView(FormView):
     form_class = AuthenticationForm
 
     def form_valid(self, form):
-        """"""
+        """
+        Handles valid form submission by authenticating the user.
+        """
         username = form.cleaned_data.get("username")
         password = form.cleaned_data.get("password")
 
@@ -43,21 +45,21 @@ class AccountLoginConfirmationView(TemplateView):
 
 class AccountLogoutYesNoView(TemplateView):
     """
-
+    View for displaying a logout confirmation page.
     """
     template_name = "account_logout_yes_no_confirmation.html"
 
 
 class AccountLogoutView(RedirectView):
     """
-    View to redirect user to the logout page.
+    View for handling user logout and redirecting to the logout confirmation page.
     """
     url = reverse_lazy("logout-confirmation")
     logged_out_user = None
 
     def get(self, request, *args, **kwargs):
         """
-
+        Logs out the current user and stores the user object for use in the redirect URL.
         """
         self.logged_out_user = request.user
         logout(request)
@@ -65,17 +67,22 @@ class AccountLogoutView(RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
         """
-
+        Constructs the URL for redirection with the user ID as a query parameter.
         """
         user_pk = self.logged_out_user.pk if self.logged_out_user else None
         return self.url + f"?userid={user_pk}"
 
 
 class AccountLogoutConfirmationView(TemplateView):
-    """staci GET, neni nutne POST"""
+    """
+    View for displaying a confirmation message after a successful logout.
+    """
     template_name = "account_logout_confirmation_template.html"
 
     def get_context_data(self, **kwargs):
+        """
+        Adds the user object to the context if a valid 'userid' is provided in the query string.
+        """
         context = super().get_context_data(**kwargs)
         user_pk = self.request.GET.get('userid')
         if user_pk:
@@ -89,13 +96,21 @@ class AccountLogoutConfirmationView(TemplateView):
 
 
 class UserRightsMixin:
-    """request bude k dispozici po vložení do view"""
-    pristupova_prava = []
+    """
+    Mixin to check if a user has the required access rights.
+    """
+    access_rights = []
 
     def user_has_rights(self, user):
-        return is_member_of_group(user, self.pristupova_prava)
+        """
+        Checks if the user belongs to at least one of the required groups.
+        """
+        return is_member_of_group(user, self.access_rights)
 
     def get_context_rights(self):
+        """
+        Adds user access rights information to the context.
+        """
         context = {
             "user_has_rights": self.user_has_rights(self.request.user)
         }

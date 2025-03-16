@@ -5,38 +5,50 @@
 {% block bootstrap5_title %}Plant List{% endblock %}
 
 {% block content %}
-    {% if plants %}
-        <div class="container mt-3">
-            <div class="d-flex flex-column align-items-center">
-                <br>
-                <div class="d-flex justify-content-center w-75 mb-4">
-                    {% if group %}
-                        <a class="view-header fs-3 m-0 text-decoration-none" href="{% url 'plant_care:plants-in-group-list' group.pk %}">🪴 Plants in '{{ group.group_name }}' 🪴</a>
-                    {% else %}
-                        <a class="view-header fs-3 m-0 text-decoration-none" href="{% url 'plant_care:plant-list' %}">🪴 Plant Collection 🪴</a>
-                    {% endif %}
-                </div>
-
-                <div class="d-flex justify-content-end w-75">
-                    <form method="get" class="d-flex" style="width: auto;" action="{% if group %}{% url 'plant_care:plants-in-group-list' group.pk %}{% else %}{% url 'plant_care:plant-list' %}{% endif %}">
-                        <input type="text" name="filter" placeholder="{% if group %}Search plant{% else %} Search plant or group"{% endif %}
-                               value="{{ request.GET.filter }}" class="text-center form-control">
-                        <button type="submit" class="btn ms-2 btn-animace">🔎</button>
-                    </form>
-                </div>
-
-                <br>
+    <div class="container mt-3">
+        <div class="d-flex flex-column align-items-center">
+            <br>
+            <div class="d-flex justify-content-center w-75 mb-4">
+                {% if group %}
+                    <a class="view-header fs-3 m-0 text-decoration-none"
+                       href="{% url 'plant_care:plants-in-group-list' group.pk %}">🪴 Plants in '{{ group.group_name }}'
+                        🪴</a>
+                {% else %}
+                    <a class="view-header fs-3 m-0 text-decoration-none" href="{% url 'plant_care:plant-list' %}">🪴
+                        Plant Collection 🪴</a>
+                {% endif %}
             </div>
-        </div>
 
+            <div class="d-flex justify-content-end w-75">
+                <form method="get" class="d-flex" autocomplete="off" style="width: auto;" action="
+
+
+                        {% if group %}{% url 'plant_care:plants-in-group-list' group.pk %}{% else %}{% url 'plant_care:plant-list' %}{% endif %}">
+                    <input type="text" name="filter"
+                           placeholder="{% if group %}Search plant{% else %} Search plant or group"{% endif %}
+                           value="{{ request.GET.filter }}" class="text-center form-control">
+                    <button type="submit" class="btn ms-2 btn-animace">🔎</button>
+                </form>
+            </div>
+
+            <br>
+        </div>
+    </div>
+    {% if plants %}
         <div class="d-flex justify-content-center align-items-center mb-4">
             <table class="table table-striped table-hover table-bordered table-sm table-responsive"
                    style="width: 75%">
                 <thead class="table-success">
                 <tr>
-                    <th style="width: 25%"><a class="text-decoration-none text-dark" href="?sort={% if request.GET.sort == "name" %}-name{% else %}name{% endif %}&filter={{ request.GET.filter|default:'' }}">Name</a></th>
-                    <th style="width: 25%"><a class="text-decoration-none text-dark" href="?sort={% if request.GET.sort == "group__group_name" %}-group__group_name{% else %}group__group_name{% endif %}&filter={{ request.GET.filter|default:'' }}">Group</a></th>
-                    <th style="width: 25%"><a class="text-decoration-none text-dark" href="?sort={% if request.GET.sort == "date" %}-date{% else %}date{% endif %}&filter={{ request.GET.filter|default:'' }}">Purchase Date</a></th>
+                    <th style="width: 25%"><a class="text-decoration-none text-dark"
+                                              href="?sort={% if request.GET.sort == "name" %}-name{% else %}name{% endif %}&filter={{ request.GET.filter|default:'' }}">Name</a>
+                    </th>
+                    <th style="width: 25%"><a class="text-decoration-none text-dark"
+                                              href="?sort={% if request.GET.sort == "group__group_name" %}-group__group_name{% else %}group__group_name{% endif %}&filter={{ request.GET.filter|default:'' }}">Group</a>
+                    </th>
+                    <th style="width: 25%"><a class="text-decoration-none text-dark"
+                                              href="?sort={% if request.GET.sort == "date" %}-date{% else %}date{% endif %}&filter={{ request.GET.filter|default:'' }}">Purchase
+                        Date</a></th>
                     <th class="text-center">Detail</th>
                     <th class="text-center">Update</th>
                     <th class="text-center">Delete</th>
@@ -77,15 +89,28 @@
         </div>
 
     {% else %}
-        {% if group %}
-            <p class="text-center mt-5">There are no plants in the '{{ group.group_name }}' group.</p>
+        {% if request.GET.filter %}
+            <div class="d-flex justify-content-center align-items-center mb-4">
+                <p class="view-header text-center mt-5">There are no results matching the search for
+                    <b>"{{ request.GET.filter }}"</b></p>
+            </div>
+        {% elif group %}
+            <div class="d-flex justify-content-center align-items-center mb-4">
+                <p class="view-header text-center mt-5">There are no plants in the <b>'{{ group.group_name }}'</b>
+                    group.</p>
+            </div>
         {% else %}
-            <p class="text-center mt-5">There are no plants in the database.</p>
+            <div class="d-flex justify-content-center align-items-center mb-4">
+                <p class="view-header text-center mt-5">There are no plants in the database.</p>
+            </div>
         {% endif %}
         <div class="container">
             <div class="d-flex justify-content-center mb-2">
-                <a href="{% url 'plant_care:plant-create' %}" id="a-button" class="btn btn-success btn-animace">Add new
+                <a href="{% url 'plant_care:plant-create' %}" id="a-button" class="btn btn-success btn-animace me-3">Add
+                    new
                     plant</a>
+                <a href="{{ request.META.HTTP_REFERER|default:'#'|escape }}"
+                   class="btn btn-success btn-animace">Back</a>
             </div>
         </div>
     {% endif %}
