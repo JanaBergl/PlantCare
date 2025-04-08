@@ -71,6 +71,9 @@
                 </tbody>
             </table>
         </div>
+
+        {% include 'snippets/pagination.html' %}
+
     {% else %}
         {% if request.GET.filter %}
             <div class="d-flex justify-content-center align-items-center mb-3">

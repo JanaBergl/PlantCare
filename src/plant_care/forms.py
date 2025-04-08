@@ -160,3 +160,11 @@ class PlantCareHistoryModelForm(forms.ModelForm):
             "task_date": forms.DateTimeInput(attrs={"type": "datetime-local", "class": "form-control"}),
 
         }
+
+    def __init__(self, *args, **kwargs) -> None:
+        """
+        Changes task_type form field to show base value instead of display value.
+        """
+        super().__init__(*args, **kwargs)
+
+        self.fields["task_type"].choices = [(display, category) for category, display in TASK_CATEGORY_CHOICES]

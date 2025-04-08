@@ -5,7 +5,6 @@ from django.db.models import QuerySet, Count, Q
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.utils import timezone
-from django.utils.timezone import now
 from django.views.generic import ListView, TemplateView, DetailView, CreateView, UpdateView, DeleteView, FormView
 from django.urls import reverse_lazy
 from plant_care.constants import TASK_CATEGORY_CHOICES, TASK_FREQUENCIES
@@ -212,11 +211,11 @@ class PlantGraveyardListingView(LoginRequiredMixin, ListView):
 class PlantCareHistoryListingView(LoginRequiredMixin, ListView):
     """
     View for a list of plant care history logs.
-
     """
     model = PlantCareHistory
     template_name = "plant_care_history_listing_page_template.html"
     context_object_name = "history"
+    paginate_by = 50
 
     def get_queryset(self) -> QuerySet:
         """
@@ -585,10 +584,12 @@ class PerformTaskView(LoginRequiredMixin, FormView):
         """
         Adds additional data to the context. Allows filtering by plant name or group name if 'filter' is provided in GET.
         Allows sorting by plant or group name in ascending or descending order if 'sort' is provided in GET.
+        Automatically selects given plant when accessed from the detail view or when the filter exactly matches a single plant.
 
         Context includes:
             - plants: All living plants, filtered by name or group if 'filter' is provided in GET.
             - plants_in_danger: Set of plants with active warnings for overdue tasks.
+            - 'selected_plants': A list of plants IDs to be pre-selected (mostly used to automatically select a plant when the view is accessed through a direct link from a plant's detail page with a filter applied).
 
         """
         context = super().get_context_data(**kwargs)
@@ -610,8 +611,16 @@ class PerformTaskView(LoginRequiredMixin, FormView):
         else:
             plants_queryset = plants_queryset.order_by("name" if not reverse else "-name")
 
+        # if
+        selected_plants = []
+        if search:
+            plant = plants_queryset.filter(name__exact=search).first()
+            if plant:
+                selected_plants = [plant.id]
+
         context["plants"] = plants_queryset
         context["plants_in_danger"] = {warning["plant"].id for warning in show_care_warnings()}
+        context["selected_plants"] = selected_plants
 
         return context
 
@@ -655,7 +664,7 @@ class PlantCareOverdueWarningsView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         warnings = show_care_warnings()
 
-        sort_by = self.request.GET.get("sort", "-days_since_task")
+        sort_by = self.request.GET.get("sort", "-days_overdue")
         reverse = False
 
         if sort_by.startswith("-"):
@@ -669,9 +678,11 @@ class PlantCareOverdueWarningsView(LoginRequiredMixin, TemplateView):
         elif sort_by == "task":
             warnings = sorted(warnings, key=lambda x: x["task_type"], reverse=reverse)
         elif sort_by == "days_overdue":
+            warnings = sorted(warnings, key=lambda x: x["days_overdue"], reverse=reverse)
+        elif sort_by == "days_since_task":
             warnings = sorted(warnings, key=lambda x: x["days_since_task"], reverse=reverse)
         else:
-            warnings = sorted(warnings, key=lambda x: x["days_since_task"], reverse=reverse)
+            warnings = sorted(warnings, key=lambda x: x["days_overdue"], reverse=reverse)
 
         context["warnings"] = warnings
         return context

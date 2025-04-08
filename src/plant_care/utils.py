@@ -23,13 +23,16 @@ def show_care_warnings() -> list:
             last_log = PlantCareHistory.objects.filter(plant=plant, task_type=task_type).order_by('-task_date').first()
             if last_log:
                 days_since_task = (today - last_log.task_date.date()).days
+                days_overdue = days_since_task - days_allowed
 
-                if days_since_task >= days_allowed:
+                if days_since_task >= days_allowed and days_overdue > 0:
                     overdue_tasks.append({
                         "plant": plant,
                         "group": plant.group,
                         "task_type": task_type,
                         "days_since_task": days_since_task,
+                        "days_overdue": days_overdue,
+
                     })
 
     return overdue_tasks

@@ -22,7 +22,6 @@
             <div class="d-flex justify-content-end w-75">
                 <form method="get" class="d-flex" autocomplete="off" style="width: auto;" action="
 
-
                         {% if group %}{% url 'plant_care:plants-in-group-list' group.pk %}{% else %}{% url 'plant_care:plant-list' %}{% endif %}">
                     <input type="text" name="filter"
                            placeholder="{% if group %}Search plant{% else %} Search plant or group"{% endif %}

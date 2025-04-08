@@ -47,7 +47,8 @@
                             <tr>
                                 <td class="text-center">
                                     <input type="checkbox" id="plant-{{ plant.id }}" name="plants"
-                                           value="{{ plant.id }}">
+                                           value="{{ plant.id }}"
+                                    {% if plant.id in selected_plants %}checked{% endif %}>
                                 </td>
                                 <td>
                                     <label for="plant-{{ plant.id }}" class="d-flex align-items-center">

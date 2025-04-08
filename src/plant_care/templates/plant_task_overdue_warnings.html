@@ -12,7 +12,7 @@
         <div class="container mt-3">
             <div class="d-flex flex-column align-items-center">
                 <br>
-                <p class="view-header fs-3 text-center">⚠️ Overdue Care Tasks ⚠️</p>
+                <a class="view-header fs-3 text-decoration-none text-center" href="{% url 'plant_care:warnings'%}">⚠️ Overdue Care Tasks ⚠️</a>
                 <br>
 
             </div>
@@ -33,7 +33,9 @@
                         </th>
                         <th><a class="text-decoration-none text-dark"
                                href="?sort={% if request.GET.sort == "days_since_task" %}-days_since_task{% else %}days_since_task{% endif %}">Days
-                            overdue</a></th>
+                            since task</a></th>
+                        <th><a class="text-decoration-none text-dark"
+                               href="?sort={% if request.GET.sort == 'days_overdue' %}-days_overdue{% else %}days_overdue{% endif %}">Days overdue</a></th>
                     </tr>
                     </thead>
                     <tbody>
@@ -46,13 +48,14 @@
                                    href="{{ warning.plant.group.get_absolute_url }}">{{ warning.plant.group.group_name }}</a>
                             </td>
                             <td><strong>{{ warning.task_type }}</strong></td>
-                            <td class="text-danger">{{ warning.days_since_task }}</td>
+                            <td class="text-dark">{{ warning.days_since_task }}</td>
+                            <td class="text-danger">{{ warning.days_overdue }}</td>
                         </tr>
                     {% endfor %}
                     </tbody>
                 </table>
             </div>
-            <div class="d-flex justify-content-center mt-4">
+            <div class="d-flex justify-content-center mt-4 mb-4">
                 <a href="{% url 'plant_care:perform-tasks' %}" class="btn me-2 btn-success btn-animace"> Plant Tasks</a>
             </div>
         </div>

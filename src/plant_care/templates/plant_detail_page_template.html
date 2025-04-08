@@ -63,7 +63,7 @@
                             <th scope="row">Warnings</th>
                             <td>
                                 {% for warning in plant_warnings %}
-                                    ⚠️ {{ warning.task_type }} is {{ warning.days_since_task }} days overdue!<br>
+                                    ⚠️ {{ warning.task_type }} is {{ warning.days_overdue }} days overdue!<br>
                                 {% endfor %}
                             </td>
                         </tr>
@@ -88,7 +88,9 @@
             {% endif %}
             <a href="{% url 'plant_care:plant-update' plant.pk %}" class="btn me-2">✏️ Update</a>
             <a href="{% url 'plant_care:plant-delete' plant.pk %}" class="btn me-2">🗑️ Delete</a>
-            <a href="{% url 'plant_care:dead-plant' plant.pk %}" class="btn">🪦 RIP</a>
+            {% if plant.is_alive %}
+                <a href="{% url 'plant_care:dead-plant' plant.pk %}" class="btn">🪦 RIP</a>
+            {% endif %}
         </div>
     </div>
 {% endblock %}
